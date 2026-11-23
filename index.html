@@ -93,14 +93,14 @@ const ngu = (ms) => new Promise((r) => setTimeout(r, ms));
 async function gui(viec, ghi = () => {}) {
   const id = crypto.randomUUID().replace(/-/g, "");
   ghi("Đang gửi lên GitHub…");
-  await gh("PUT", "vao/" + id + ".bin", { message: "viec", content: b64(await maHoa({ ...viec, id, t: Date.now() })) });
+  await gh("PUT", "vao/" + id + ".bin", { message: "viec", content: btoa(b64(await maHoa({ ...viec, id, t: Date.now() }))) });   // file = chữ base64 (GitHub không đổi bảng mã)
   const bd = Date.now();
   while (Date.now() - bd < 4 * 60_000) {
     ghi(`Đã gửi — chờ bot nhận (${Math.round((Date.now() - bd) / 1000)}s)…`);
     await ngu(4000);
     const f = await gh("GET", "ra/" + id + ".bin");
     if (!f) continue;
-    const o = await giaiMa(tuB64(f.content));
+    const o = await giaiMa(tuB64(atob(f.content.replace(/\s/g, ""))));
     gh("DELETE", "ra/" + id + ".bin", { message: "doc", sha: f.sha }).catch(() => {});
     if (o.id !== id) throw new Error("kết quả lạ");
     if (o.kq?.can_dang_nhap) { sessionStorage.removeItem("phien"); setTimeout(() => location.reload(), 1500); }
