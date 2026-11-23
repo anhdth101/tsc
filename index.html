@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>TSC — nạp số liệu</title>
+<style>
+:root{--nen:#f4f6f9;--the:#fff;--chu:#1d2433;--mo:#6b7487;--vien:#e3e7ee;--xanh:#1f7a4d;--xanh-nhat:#e6f4ec;--do:#b42318;--do-nhat:#fdecea;--chinh:#2457c5;--chinh-nhat:#e8eefb}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--nen);color:var(--chu)}
+header{background:var(--the);border-bottom:1px solid var(--vien);padding:10px 18px;display:flex;align-items:center;gap:14px}
+header h1{font-size:17px;margin:0}
+main{padding:18px;max-width:900px;margin:0 auto;display:grid;gap:14px}
+.the{background:var(--the);border:1px solid var(--vien);border-radius:10px;padding:14px 16px}
+.the h3{margin:0 0 8px;font-size:13px;color:var(--mo);font-weight:600;text-transform:uppercase;letter-spacing:.03em}
+.nho{color:var(--mo);font-size:12.5px}
+.nut{border:1px solid var(--vien);background:var(--the);padding:7px 13px;border-radius:7px;cursor:pointer;font:inherit;color:var(--chu)}
+.nut.chinh{background:var(--chinh);border-color:var(--chinh);color:#fff}
+.nut:disabled{opacity:.5;cursor:default}
+input[type=text],input[type=password]{font:inherit;padding:6px 9px;border:1px solid var(--vien);border-radius:6px;width:100%;margin-top:8px}
+.an{display:none!important}
+#dangnhap{max-width:380px;margin:10vh auto}
+#tha{border:2px dashed #b9c2d3;border-radius:10px;padding:26px;text-align:center;cursor:pointer;background:#fafbfd}
+#tha.keo{border-color:var(--chinh);background:var(--chinh-nhat)}
+.kq{white-space:pre-wrap;padding:9px 12px;border-radius:8px;background:#f2f4f8;margin-top:8px}
+.kq.do{background:var(--do-nhat);color:var(--do)}.kq.xanh{background:var(--xanh-nhat);color:var(--xanh)}
+td{padding:4px 10px 4px 0;vertical-align:top}
+.phai{margin-left:auto}
+</style>
+</head>
+<body>
+<div id="dangnhap" class="the">
+  <h2 style="margin-top:0">Nạp số liệu bot</h2>
+  <p class="nho">Đường qua GitHub — dùng khi máy không vào được trang quản lý thường. Mỗi việc mất ~15–40 giây.</p>
+  <form id="dn">
+    <input type="password" id="khoa" placeholder="Khoá trang (đội dùng chung)" autocomplete="off">
+    <label class="nho" style="display:block;margin-top:4px"><input type="checkbox" id="nho"> nhớ khoá trang trên máy này</label>
+    <input type="password" id="mk" placeholder="Mật khẩu của mày (như trang quản lý)" autocomplete="current-password">
+    <input type="text" id="ma" class="an" placeholder="Mã 6 số Google Authenticator" inputmode="numeric" maxlength="7">
+    <p><button class="nut chinh" id="dn-nut" style="width:100%">Đăng nhập</button></p>
+  </form>
+  <div id="dn-tt" class="nho"></div>
+</div>
+
+<div id="app" class="an">
+<header><h1>📥 Nạp số liệu bot</h1><span class="nho" id="ai"></span><button class="nut phai" id="thoat">Đăng xuất</button></header>
+<main>
+  <div class="the"><h3>Số liệu bot đang có</h3><div id="tt" class="nho">…</div><p><button class="nut" id="lai">Xem lại</button></p></div>
+  <div class="the"><h3>Kéo thả file</h3>
+    <div id="tha">Kéo file vào đây hoặc bấm để chọn<br><span class="nho">Dashboard (.html) · File 9380 (.xls) · "Final Deal mass theo ngành" (.xlsx)</span></div>
+    <input type="file" id="chon" accept=".html,.htm,.xls,.xlsx" class="an" multiple>
+    <div id="nap-kq"></div>
+  </div>
+  <div class="the an" id="o-vcsh"><h3>Vốn chủ sở hữu (tỷ đồng)</h3>
+    <input type="text" id="vcsh" placeholder="vd 8.500 — để trống = giữ số cũ, 0 = xoá"><p><button class="nut chinh" id="vcsh-nut">Lưu VCSH</button></p><div id="vcsh-kq"></div></div>
+  <div class="the an" id="o-thu"><h3>Thử câu hỏi (không tốn tin Zalo)</h3>
+    <input type="text" id="cau" placeholder="vd EVF  ·  ls EVF  ·  room tổng"><p><button class="nut chinh" id="thu-nut">Thử</button></p><div id="thu-kq"></div></div>
+</main>
+</div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const API = "https://api.github.com/repos/";
+let CH = null, KEY = null, TOKEN = null;
+const MUOI = "tsc-cua-github-v1", VONG = 200000;
+
+const b64 = (u) => { u = new Uint8Array(u); let s = ""; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
+const tuB64 = (s) => Uint8Array.from(atob(s.replace(/\s/g, "")), (c) => c.charCodeAt(0));
+async function taoKhoa(k) {
+  const goc = await crypto.subtle.importKey("raw", new TextEncoder().encode(k), "PBKDF2", false, ["deriveKey"]);
+  return crypto.subtle.deriveKey({ name: "PBKDF2", salt: new TextEncoder().encode(MUOI), iterations: VONG, hash: "SHA-256" }, goc, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
+}
+async function maHoa(o) {
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, KEY, new TextEncoder().encode(JSON.stringify(o))));
+  const r = new Uint8Array(12 + ct.length); r.set(iv); r.set(ct, 12); return r;
+}
+async function giaiMa(u) {
+  return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name: "AES-GCM", iv: u.subarray(0, 12) }, KEY, u.subarray(12))));
+}
+async function gh(method, p, body) {
+  const r = await fetch(API + CH.repo + "/contents/" + p, { method, cache: "no-store",
+    headers: { authorization: "Bearer " + TOKEN, accept: "application/vnd.github+json", ...(body ? { "content-type": "application/json" } : {}) },
+    body: body ? JSON.stringify(body) : undefined });
+  if (r.status === 404) return null;
+  if (r.status === 401) throw new Error("Token GitHub hết hạn/sai — báo chủ bot");
+  if (!r.ok) throw new Error("GitHub " + r.status);
+  return r.json();
+}
+const ngu = (ms) => new Promise((r) => setTimeout(r, ms));
+/** gửi 1 việc vào hộp thư, chờ bot trả lời */
+async function gui(viec, ghi = () => {}) {
+  const id = crypto.randomUUID().replace(/-/g, "");
+  ghi("Đang gửi lên GitHub…");
+  await gh("PUT", "vao/" + id + ".bin", { message: "viec", content: b64(await maHoa({ ...viec, id, t: Date.now() })) });
+  const bd = Date.now();
+  while (Date.now() - bd < 4 * 60_000) {
+    ghi(`Đã gửi — chờ bot nhận (${Math.round((Date.now() - bd) / 1000)}s)…`);
+    await ngu(4000);
+    const f = await gh("GET", "ra/" + id + ".bin");
+    if (!f) continue;
+    const o = await giaiMa(tuB64(f.content));
+    gh("DELETE", "ra/" + id + ".bin", { message: "doc", sha: f.sha }).catch(() => {});
+    if (o.id !== id) throw new Error("kết quả lạ");
+    if (o.kq?.can_dang_nhap) { sessionStorage.removeItem("phien"); setTimeout(() => location.reload(), 1500); }
+    return o.kq;
+  }
+  throw new Error("Bot chưa trả lời sau 4 phút (bot đang tắt/ngủ?) — thử lại sau");
+}
+const viec = async (p, body, ghi) => { const kq = await gui({ phien: sessionStorage.getItem("phien"), p, body }, ghi); if (kq?.loi) throw new Error(kq.loi); return kq; };
+function hien(el, m, kieu = "") { el.innerHTML = ""; const d = document.createElement("div"); d.className = "kq " + kieu; d.textContent = m; el.append(d); }
+
+// ---------- đăng nhập ----------
+async function moKhoa(k) {
+  KEY = await taoKhoa(k);
+  try { TOKEN = await giaiMa(tuB64(CH.tk)); } catch { KEY = null; throw new Error("Sai khoá trang"); }
+}
+$("#dn").onsubmit = async (e) => {
+  e.preventDefault();
+  const nut = $("#dn-nut"), tt = $("#dn-tt"); nut.disabled = true;
+  try {
+    const k = $("#khoa").value;
+    await moKhoa(k);
+    if ($("#nho").checked) localStorage.setItem("khoa_trang", k); else localStorage.removeItem("khoa_trang");
+    sessionStorage.setItem("khoa_trang", k);
+    const kq = await gui({ dang_nhap: { mat_khau: $("#mk").value, ma: $("#ma").value } }, (m) => (tt.textContent = m));
+    if (kq.can_ma) { $("#ma").classList.remove("an"); $("#ma").focus(); tt.textContent = kq.loi; return; }
+    if (kq.loi) throw new Error(kq.loi);
+    sessionStorage.setItem("phien", kq.phien); sessionStorage.setItem("ai", JSON.stringify({ ten: kq.ten, vai: kq.vai }));
+    vao();
+  } catch (e2) { tt.textContent = "❌ " + e2.message; }
+  finally { nut.disabled = false; }
+};
+$("#thoat").onclick = () => { sessionStorage.clear(); location.reload(); };
+
+const gio = (v) => (v ? new Date(v).toLocaleString("vi-VN") : "—");
+async function xemTT() {
+  const o = $("#tt");
+  try {
+    const d = (await viec("du-lieu-nhap", {}, (m) => (o.textContent = m))).du_lieu || {};
+    o.innerHTML = "<table></table>";
+    const t = o.firstChild, dong = (a, b) => { const r = t.insertRow(); r.insertCell().textContent = a; r.insertCell().textContent = b; };
+    dong("Final Deal", d.deal ? `ngày ${d.deal.ngay || "?"} · nạp ${gio(d.deal.nap_luc)} · ${d.deal.by || ""}` : "chưa có");
+    dong("Room 9380", d.room ? `ngày ${d.room.date || "?"} · nạp ${gio(d.room.loadedAt)} · ${d.room.by || ""}` : "chưa có");
+    dong("Dashboard", d.dash ? `${d.dash.ky || ""} · ${gio(d.dash.luc)} · ${d.dash.ok ? "OK" : d.dash.buoc || ""}` : "—");
+  } catch (e) { o.textContent = "❌ " + e.message; }
+}
+function vao() {
+  const ai = JSON.parse(sessionStorage.getItem("ai") || "{}");
+  $("#dangnhap").classList.add("an"); $("#app").classList.remove("an");
+  $("#ai").textContent = `${ai.ten} (${ai.vai === "chu" ? "chủ" : "nhập số liệu"})`;
+  if (ai.vai === "chu") { $("#o-vcsh").classList.remove("an"); $("#o-thu").classList.remove("an"); }
+  xemTT();
+}
+$("#lai").onclick = xemTT;
+
+// ---------- nạp file: đọc Excel ngay trên máy (bộ đọc không tải được -> gửi nguyên file, bot tự đọc) ----------
+let xlsxSan = null;
+const napXlsx = () => (xlsxSan ??= new Promise((ok, loi) => { const s = document.createElement("script"); s.src = "xlsx.full.min.js"; s.onload = () => (window.XLSX ? ok(window.XLSX) : loi(new Error("hỏng"))); s.onerror = () => loi(new Error("không tải được")); document.head.append(s); }).catch((e) => { xlsxSan = null; throw e; }));
+let dang = false;
+async function napFile(f) {
+  const o = $("#nap-kq");
+  if (dang) return hien(o, "Đang nạp file khác, chờ chút", "do");
+  dang = true;
+  const ghi = (m) => hien(o, `${f.name}: ${m}`);
+  try {
+    let body;
+    if (/\.html?$/i.test(f.name)) body = { kieu: "dash", ten: f.name, text: await f.text() };
+    else if (/\.xlsx?$/i.test(f.name)) {
+      ghi("đang đọc trên máy này…");
+      const ab = await f.arrayBuffer(), X = await napXlsx().catch(() => null);
+      if (!X) { if (f.size > 20 * 1048576) throw new Error("file quá 20 MB"); body = { kieu: "xlsx-tho", ten: f.name, base64: b64(ab) }; }
+      else if (X.read(ab, { type: "array", bookSheets: true }).SheetNames.includes("Tổng hợp nhóm")) {
+        const wb = X.read(ab, { type: "array", sheets: ["Tổng hợp nhóm", "Tổng quan"] });
+        body = { kieu: "deal", ten: f.name, rows: X.utils.sheet_to_json(wb.Sheets["Tổng hợp nhóm"], { header: 1, defval: "", raw: true }),
+          tong_quan: wb.Sheets["Tổng quan"] ? X.utils.sheet_to_json(wb.Sheets["Tổng quan"], { header: 1, defval: "", raw: false }).slice(0, 5) : [] };
+      } else { if (f.size > 20 * 1048576) throw new Error("file 9380 quá 20 MB"); body = { kieu: "room", ten: f.name, base64: b64(ab) }; }
+    } else throw new Error("Chỉ nhận .html hoặc .xls/.xlsx");
+    const kq = await viec("nap-file", body, ghi);
+    hien(o, `${f.name}\n${kq.ket_qua}`, "xanh");
+    xemTT();
+  } catch (e) { hien(o, `${f.name}: ❌ ${e.message}`, "do"); }
+  finally { dang = false; }
+}
+async function napNhieu(ds) { for (const f of ds) { await napFile(f); } }
+const tha = $("#tha");
+tha.onclick = () => $("#chon").click();
+$("#chon").onchange = (e) => { napNhieu([...e.target.files]); e.target.value = ""; };
+tha.ondragover = (e) => { e.preventDefault(); tha.classList.add("keo"); };
+tha.ondragleave = () => tha.classList.remove("keo");
+tha.ondrop = (e) => { e.preventDefault(); tha.classList.remove("keo"); napNhieu([...e.dataTransfer.files]); };
+
+$("#vcsh-nut").onclick = async () => {
+  const o = $("#vcsh-kq"), n = $("#vcsh-nut"); n.disabled = true;
+  try { hien(o, (await viec("deal-cai", { vcsh_ty: $("#vcsh").value }, (m) => hien(o, m))).ket_qua, "xanh"); }
+  catch (e) { hien(o, "❌ " + e.message, "do"); } finally { n.disabled = false; }
+};
+$("#thu-nut").onclick = async () => {
+  const o = $("#thu-kq"), n = $("#thu-nut"); n.disabled = true;
+  try { hien(o, (await viec("thu-tra", { cau: $("#cau").value }, (m) => hien(o, m))).ket_qua); }
+  catch (e) { hien(o, "❌ " + e.message, "do"); } finally { n.disabled = false; }
+};
+
+// ---------- mở trang ----------
+(async () => {
+  try { CH = await (await fetch("cau-hinh.json", { cache: "no-store" })).json(); }
+  catch { $("#dn-tt").textContent = "❌ Thiếu cau-hinh.json — chủ bot chưa cài"; return; }
+  const k = sessionStorage.getItem("khoa_trang") || localStorage.getItem("khoa_trang");
+  if (k) { $("#khoa").value = k; $("#nho").checked = !!localStorage.getItem("khoa_trang"); }
+  if (k && sessionStorage.getItem("phien")) { try { await moKhoa(k); vao(); } catch {} }
+})();
+</script>
+</body>
+</html>
