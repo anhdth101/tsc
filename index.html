@@ -32,7 +32,7 @@ td{padding:4px 10px 4px 0;vertical-align:top}
 <body>
 <div id="dangnhap" class="the">
   <h2 style="margin-top:0">Nạp số liệu bot</h2>
-  <p class="nho">Đường qua GitHub — dùng khi máy không vào được trang quản lý thường. Mỗi việc mất ~15–40 giây.</p>
+  <p class="nho">Đường qua GitHub — dùng khi máy không vào được trang quản lý thường. Mỗi việc mất ~5–15 giây.</p>
   <form id="dn">
     <input type="text" id="khoa" placeholder="Khoá trang: xxxx-xxxx-xxxx-xxxx" autocomplete="off" spellcheck="false" autocapitalize="off">
     <label class="nho" style="display:block;margin-top:4px"><input type="checkbox" id="nho"> nhớ khoá trang trên máy này</label>
@@ -97,7 +97,7 @@ async function gui(viec, ghi = () => {}) {
   const bd = Date.now();
   while (Date.now() - bd < 4 * 60_000) {
     ghi(`Đã gửi — chờ bot nhận (${Math.round((Date.now() - bd) / 1000)}s)…`);
-    await ngu(4000);
+    await ngu(Date.now() - bd < 30_000 ? 2000 : 4000);
     const f = await gh("GET", "ra/" + id + ".bin");
     if (!f) continue;
     const o = await giaiMa(tuB64(atob(f.content.replace(/\s/g, ""))));
