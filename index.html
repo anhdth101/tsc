@@ -4,246 +4,698 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>TSC — nạp số liệu</title>
+<title>Quản lý Bot (qua GitHub)</title>
 <style>
-:root{--nen:#f4f6f9;--the:#fff;--chu:#1d2433;--mo:#6b7487;--vien:#e3e7ee;--xanh:#1f7a4d;--xanh-nhat:#e6f4ec;--do:#b42318;--do-nhat:#fdecea;--chinh:#2457c5;--chinh-nhat:#e8eefb}
+:root{--nen:#f4f6f9;--the:#fff;--chu:#1d2433;--mo:#6b7487;--vien:#e3e7ee;--xanh:#1f7a4d;--xanh-nhat:#e6f4ec;--do:#b42318;--do-nhat:#fdecea;--vang:#a15c00;--vang-nhat:#fff4e0;--chinh:#2457c5;--chinh-nhat:#e8eefb}
 *{box-sizing:border-box}
 body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--nen);color:var(--chu)}
-header{background:var(--the);border-bottom:1px solid var(--vien);padding:10px 18px;display:flex;align-items:center;gap:14px}
+header{background:var(--the);border-bottom:1px solid var(--vien);padding:10px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;position:sticky;top:0;z-index:5}
 header h1{font-size:17px;margin:0}
-main{padding:18px;max-width:900px;margin:0 auto;display:grid;gap:14px}
+.cham{width:10px;height:10px;border-radius:50%;display:inline-block;background:#aab}
+.cham.on{background:#22a35a}.cham.off{background:#d03b2f}
+nav{display:flex;gap:4px;flex-wrap:wrap}
+nav button{border:0;background:none;padding:7px 12px;border-radius:7px;cursor:pointer;font:inherit;color:var(--mo)}
+nav button.chon{background:var(--chinh-nhat);color:var(--chinh);font-weight:600}
+.phai{margin-left:auto;display:flex;gap:8px;align-items:center}
+main{padding:18px;max-width:1280px;margin:0 auto}
+.luoi{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
 .the{background:var(--the);border:1px solid var(--vien);border-radius:10px;padding:14px 16px}
 .the h3{margin:0 0 8px;font-size:13px;color:var(--mo);font-weight:600;text-transform:uppercase;letter-spacing:.03em}
+.so{font-size:26px;font-weight:700}
 .nho{color:var(--mo);font-size:12.5px}
-.nut{border:1px solid var(--vien);background:var(--the);padding:7px 13px;border-radius:7px;cursor:pointer;font:inherit;color:var(--chu)}
+.thanh{height:9px;background:#edf0f5;border-radius:5px;overflow:hidden;margin:6px 0}
+.thanh i{display:block;height:100%;background:var(--xanh)}
+.thanh i.vang{background:#e0a100}.thanh i.do{background:var(--do)}
+.bao{padding:9px 12px;border-radius:8px;margin-bottom:8px;background:var(--vang-nhat);color:var(--vang);border:1px solid #f3d9a8}
+.bao.do{background:var(--do-nhat);color:var(--do);border-color:#f3c1bb}
+.bao.xanh{background:var(--xanh-nhat);color:var(--xanh);border-color:#b9e0c9}
+button.nut,a.nut{border:1px solid var(--vien);background:var(--the);padding:7px 13px;border-radius:7px;cursor:pointer;font:inherit;color:var(--chu);text-decoration:none;display:inline-block}
+button.nut:hover{border-color:#b9c2d3}
 .nut.chinh{background:var(--chinh);border-color:var(--chinh);color:#fff}
-.nut:disabled{opacity:.5;cursor:default}
-input[type=text],input[type=password]{font:inherit;padding:6px 9px;border:1px solid var(--vien);border-radius:6px;width:100%;margin-top:8px}
+.nut.do{color:var(--do);border-color:#f0b8b1}
+.nut.nho{padding:3px 9px;font-size:12.5px}
+button:disabled{opacity:.5;cursor:default}
+table{width:100%;border-collapse:collapse;background:var(--the)}
+th,td{text-align:left;padding:8px 9px;border-bottom:1px solid var(--vien);vertical-align:middle}
+th{font-size:12px;color:var(--mo);font-weight:600;background:#fafbfd;position:sticky;top:0}
+tr:hover td{background:#fafcff}
+.bang{border:1px solid var(--vien);border-radius:10px;overflow:auto;max-height:70vh}
+input[type=text],input[type=password],input[type=search],select,textarea{font:inherit;padding:6px 9px;border:1px solid var(--vien);border-radius:6px;background:#fff;color:inherit;width:100%}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--chinh-nhat);border-color:var(--chinh)}
+.the-chip{display:inline-block;padding:1px 8px;border-radius:10px;font-size:12px;background:#eef1f6;color:var(--mo);margin:1px 2px 1px 0;white-space:nowrap}
+.the-chip.xanh{background:var(--xanh-nhat);color:var(--xanh)}.the-chip.do{background:var(--do-nhat);color:var(--do)}.the-chip.chinh{background:var(--chinh-nhat);color:var(--chinh)}.the-chip.vang{background:var(--vang-nhat);color:var(--vang)}
+.thanh-cong{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.thanh-cong input[type=search]{max-width:280px}
+.ma{font-family:ui-monospace,Consolas,monospace;font-size:12px;color:var(--mo)}
+.log{background:#11161f;color:#d6dbe4;font:12px/1.45 ui-monospace,Consolas,monospace;padding:12px;border-radius:10px;height:65vh;overflow:auto;white-space:pre-wrap;word-break:break-word}
+.log .error{color:#ff8b80}.log .warn{color:#ffd27a}.log .t{color:#7d8799}
+.form-nhom{margin-bottom:18px}
+.form-nhom h4{margin:0 0 8px;font-size:14px}
+.dong-bien{display:grid;grid-template-columns:minmax(180px,260px) 1fr auto;gap:8px;align-items:center;padding:6px 0;border-bottom:1px dashed var(--vien)}
+.bang-bm td{vertical-align:top;padding:8px 10px;border-bottom:1px solid var(--vien);font-size:13.5px}.bang-bm td:first-child{white-space:nowrap;width:150px}
+.dong-bien .k{font-weight:600;font-size:13px}.dong-bien .k small{display:block;font-weight:400;color:var(--mo)}
+#thongbao{position:fixed;bottom:18px;right:18px;display:flex;flex-direction:column;gap:8px;z-index:20}
+#thongbao div{background:#1d2433;color:#fff;padding:10px 14px;border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.2);max-width:380px}
+#thongbao div.loi{background:var(--do)}
 .an{display:none!important}
-#dangnhap{max-width:380px;margin:10vh auto}
-#tha{border:2px dashed #b9c2d3;border-radius:10px;padding:26px;text-align:center;cursor:pointer;background:#fafbfd}
-#tha.keo{border-color:var(--chinh);background:var(--chinh-nhat)}
-.kq{white-space:pre-wrap;padding:9px 12px;border-radius:8px;background:#f2f4f8;margin-top:8px}
-.kq.do{background:var(--do-nhat);color:var(--do)}.kq.xanh{background:var(--xanh-nhat);color:var(--xanh)}
-td{padding:4px 10px 4px 0;vertical-align:top}
-.phai{margin-left:auto}
+#dangnhap{max-width:360px;margin:12vh auto}
+.goi-y{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+@media (max-width:700px){.dong-bien{grid-template-columns:1fr}main{padding:10px}}
 </style>
 </head>
 <body>
-<div id="dangnhap" class="the">
-  <h2 style="margin-top:0">Nạp số liệu bot</h2>
-  <p class="nho">Đường qua GitHub — dùng khi máy không vào được trang quản lý thường. Mỗi việc mất ~5–15 giây.</p>
-  <form id="dn">
-    <input type="text" id="khoa" placeholder="Khoá trang: xxxx-xxxx-xxxx-xxxx" autocomplete="off" spellcheck="false" autocapitalize="off">
-    <label class="nho" style="display:block;margin-top:4px"><input type="checkbox" id="nho"> nhớ khoá trang trên máy này</label>
-    <input type="password" id="mk" placeholder="Mật khẩu của mày (như trang quản lý)" autocomplete="current-password">
-    <input type="text" id="ma" class="an" placeholder="Mã 6 số Google Authenticator" inputmode="numeric" maxlength="7">
-    <p><button class="nut chinh" id="dn-nut" style="width:100%">Đăng nhập</button></p>
-  </form>
-  <div id="dn-tt" class="nho"></div>
+<div id="dangnhap" class="the an">
+  <h2 style="margin-top:0">Quản lý Bot Zalo</h2>
+  <p class="nho" id="dn-ghi">Nhập mật khẩu trang quản lý.</p>
+  <form id="dn-form"><div id="dn-gh" class="an"><input type="text" id="dn-khoa" placeholder="Khoá trang: xxxx-xxxx-xxxx-xxxx" autocomplete="off" spellcheck="false" autocapitalize="off">
+  <label class="nho" style="display:block;margin:4px 0 8px"><input type="checkbox" id="dn-nho"> nhớ khoá trang trên máy này</label></div>
+  <input type="password" id="dn-mk" placeholder="Mật khẩu" autocomplete="current-password" autofocus>
+  <input type="text" id="dn-ma" class="an" placeholder="Mã 6 số trong Google Authenticator" inputmode="numeric" autocomplete="one-time-code" maxlength="7" style="margin-top:8px;font-size:18px;letter-spacing:4px;text-align:center">
+  <p><button class="nut chinh" style="width:100%">Đăng nhập</button></p></form>
+  <p class="nho" id="dn-loi" style="color:var(--do)"></p>
 </div>
 
 <div id="app" class="an">
-<header><h1>📥 Nạp số liệu bot</h1><span class="nho" id="ai"></span><button class="nut phai" id="thoat">Đăng xuất</button></header>
-<main>
-  <div class="the"><h3>Số liệu bot đang có</h3><div id="tt" class="nho">…</div><div id="bs-tt" class="nho" style="margin-top:6px"></div><p><button class="nut" id="lai">Xem lại</button></p></div>
-  <div class="the"><h3>Kéo thả file</h3>
-    <div id="tha">Kéo file vào đây hoặc bấm để chọn<br><span class="nho">Dashboard (.html) · File 9380 (.xls) · "Final Deal mass theo ngành" (.xlsx)</span></div>
-    <input type="file" id="chon" accept=".html,.htm,.xls,.xlsx" class="an" multiple>
-    <div id="nap-kq"></div>
+<header>
+  <h1>🤖 Quản lý Bot</h1>
+  <span><span class="cham" id="h-cham"></span> <span id="h-tt">…</span></span>
+  <nav id="tabs"></nav>
+  <div class="phai">
+    <button class="nut" id="h-tamdung"></button>
+    <button class="nut" id="h-kdl">Khởi động lại</button>
+    <button class="nut nho" id="h-thoat">Đăng xuất</button>
   </div>
-  <div class="the an" id="o-vcsh"><h3>Vốn chủ sở hữu (tỷ đồng)</h3>
-    <input type="text" id="vcsh" placeholder="vd 8.500 — để trống = giữ số cũ, 0 = xoá"><p><button class="nut chinh" id="vcsh-nut">Lưu VCSH</button></p><div id="vcsh-kq"></div></div>
-  <div class="the an" id="o-thu"><h3>Thử câu hỏi (không tốn tin Zalo)</h3>
-    <input type="text" id="cau" placeholder="vd EVF  ·  ls EVF  ·  room tổng"><p><button class="nut chinh" id="thu-nut">Thử</button></p><div id="thu-kq"></div></div>
+</header>
+<main>
+  <section data-tab="tong"></section>
+  <section data-tab="nap"></section>
+  <section data-tab="tk"></section>
+  <section data-tab="nguoi"></section>
+  <section data-tab="nhom"></section>
+  <section data-tab="gui"></section>
+  <section data-tab="cai"></section>
+  <section data-tab="log"></section>
+  <section data-tab="luu"></section>
 </main>
 </div>
+<div id="thongbao"></div>
 
+<script src="cua-gh.js"></script>
 <script>
-const $ = (s) => document.querySelector(s);
-const API = "https://api.github.com/repos/";
-let CH = null, KEY = null, TOKEN = null;
-const MUOI = "tsc-cua-github-v1", VONG = 200000;
+const TABS_CHU = [["tong", "Tổng quan"], ["nap", "Nạp dữ liệu"], ["nguoi", "Người dùng"], ["nhom", "Nhóm"], ["gui", "Gửi tin"], ["tk", "Tài khoản"], ["cai", "Cài đặt"], ["log", "Nhật ký"], ["luu", "Bảo mật & sao lưu"]];
+const TABS_NHAP = [["nap", "Nạp dữ liệu"]];
+let VAI = null, TEN = "";
+const $ = (s, el = document) => el.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const tg = (ms) => { if (!ms) return "—"; const d = (Date.now() - ms) / 1000; if (d < 60) return "vừa xong"; if (d < 3600) return Math.floor(d / 60) + " phút trước"; if (d < 86400) return Math.floor(d / 3600) + " giờ trước"; return Math.floor(d / 86400) + " ngày trước"; };
+const phut = (m) => m == null ? "—" : m < 60 ? m + " phút" : m < 1440 ? Math.floor(m / 60) + " giờ " + (m % 60) + " phút" : Math.floor(m / 1440) + " ngày " + Math.floor((m % 1440) / 60) + " giờ";
+let D = null, tab = location.hash.slice(1) || "tong", dangSua = false, hen = null;
 
-const b64 = (u) => { u = new Uint8Array(u); let s = ""; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
-const tuB64 = (s) => Uint8Array.from(atob(s.replace(/\s/g, "")), (c) => c.charCodeAt(0));
-async function taoKhoa(k) {
-  const goc = await crypto.subtle.importKey("raw", new TextEncoder().encode(k), "PBKDF2", false, ["deriveKey"]);
-  return crypto.subtle.deriveKey({ name: "PBKDF2", salt: new TextEncoder().encode(MUOI), iterations: VONG, hash: "SHA-256" }, goc, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
+function bao(msg, loi = false) {
+  const d = document.createElement("div"); d.textContent = msg; if (loi) d.className = "loi";
+  $("#thongbao").append(d); setTimeout(() => d.remove(), loi ? 7000 : 3500);
 }
-async function maHoa(o) {
-  const iv = crypto.getRandomValues(new Uint8Array(12));
-  const ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, KEY, new TextEncoder().encode(JSON.stringify(o))));
-  const r = new Uint8Array(12 + ct.length); r.set(iv); r.set(ct, 12); return r;
-}
-async function giaiMa(u) {
-  return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name: "AES-GCM", iv: u.subarray(0, 12) }, KEY, u.subarray(12))));
-}
-async function gh(method, p, body) {
-  const r = await fetch(API + CH.repo + "/contents/" + p, { method, cache: "no-store",
-    headers: { authorization: "Bearer " + TOKEN, accept: "application/vnd.github+json", ...(body ? { "content-type": "application/json" } : {}) },
-    body: body ? JSON.stringify(body) : undefined });
-  if (r.status === 404) return null;
-  if (r.status === 401) throw new Error("Token GitHub hết hạn/sai — báo chủ bot");
-  if (!r.ok) throw new Error("GitHub " + r.status);
-  return r.json();
-}
-const ngu = (ms) => new Promise((r) => setTimeout(r, ms));
-/** gửi 1 việc vào hộp thư, chờ bot trả lời */
-async function gui(viec, ghi = () => {}) {
-  const id = crypto.randomUUID().replace(/-/g, "");
-  ghi("Đang gửi lên GitHub…");
-  await gh("PUT", "vao/" + id + ".bin", { message: "viec", content: btoa(b64(await maHoa({ ...viec, id, t: Date.now() }))) });   // file = chữ base64 (GitHub không đổi bảng mã)
-  const bd = Date.now();
-  while (Date.now() - bd < 4 * 60_000) {
-    ghi(`Đã gửi — chờ bot nhận (${Math.round((Date.now() - bd) / 1000)}s)…`);
-    await ngu(Date.now() - bd < 30_000 ? 2000 : 4000);
-    const f = await gh("GET", "ra/" + id + ".bin");
-    if (!f) continue;
-    const o = await giaiMa(tuB64(atob(f.content.replace(/\s/g, ""))));
-    gh("DELETE", "ra/" + id + ".bin", { message: "doc", sha: f.sha }).catch(() => {});
-    if (o.id !== id) throw new Error("kết quả lạ");
-    if (o.kq?.can_dang_nhap) { sessionStorage.removeItem("phien"); setTimeout(() => location.reload(), 1500); }
-    return o.kq;
+async function api(p, body) {
+  if (window.GH) {                                     // trang GitHub (cua-gh.js): lệnh đi qua hộp thư
+    const j = await GH.api(p, body);
+    if (j?.can_dang_nhap) { hienDangNhap("Hết phiên — đăng nhập lại"); throw new Error("Cần đăng nhập"); }
+    if (j?.loi) throw new Error(j.loi);
+    return j;
   }
-  throw new Error("Bot chưa trả lời sau 4 phút (bot đang tắt/ngủ?) — thử lại sau");
+  const r = await fetch("/quan-ly/api/" + p, body === undefined ? { credentials: "same-origin" } :
+    { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json", "x-ql": "1" }, body: JSON.stringify(body) });
+  const j = await r.json().catch(() => ({ loi: "HTTP " + r.status }));
+  if (r.status === 401 && j.can_dang_nhap) { hienDangNhap(); throw new Error("Cần đăng nhập"); }
+  if (!r.ok) throw new Error(j.loi || "HTTP " + r.status);
+  return j;
 }
-const viec = async (p, body, ghi) => { const kq = await gui({ phien: sessionStorage.getItem("phien"), p, body }, ghi); if (kq?.loi) throw new Error(kq.loi); return kq; };
-function hien(el, m, kieu = "") { el.innerHTML = ""; const d = document.createElement("div"); d.className = "kq " + kieu; d.textContent = m; el.append(d); }
+async function lam(fn, ok) { try { const r = await fn(); if (ok) bao(ok); await tai(); return r; } catch (e) { bao(e.message, true); } }
 
-// ---------- đăng nhập ----------
-/** khoá dạng xxxx-xxxx-xxxx-xxxx: bỏ dấu cách/xuống dòng, chữ thường, thiếu gạch thì tự thêm */
-function chuanKhoa(k) {
-  let s = String(k || "").toLowerCase().replace(/[\s​ ]/g, "");
-  const tron = s.replace(/[^a-z0-9]/g, "");
-  if (/^[a-z0-9]{16}$/.test(tron) && /^[a-z0-9-]+$/.test(s)) s = tron.replace(/(.{4})(?=.)/g, "$1-");
-  return s;
+function hienDangNhap(ghi) {
+  clearInterval(hen); D = null; VAI = null;
+  for (const s of document.querySelectorAll("main section")) s.innerHTML = "";
+  $("#app").classList.add("an"); $("#dangnhap").classList.remove("an");
+  if (ghi) $("#dn-ghi").textContent = ghi;
 }
-async function moKhoa(k) {
-  for (const thu of [...new Set([chuanKhoa(k), String(k || "").trim()])]) {
-    KEY = await taoKhoa(thu);
-    try { TOKEN = await giaiMa(tuB64(CH.tk)); return thu; } catch {}
+$("#dn-form").onsubmit = async (e) => {
+  e.preventDefault(); $("#dn-loi").textContent = "";
+  if (window.GH) {
+    const nut = $("#dn-form button"); nut.disabled = true;
+    try {
+      const j = await GH.dangNhap($("#dn-khoa").value, $("#dn-mk").value, $("#dn-ma").value, (m) => ($("#dn-loi").textContent = m));
+      if (j.can_ma) { $("#dn-ma").classList.remove("an"); $("#dn-ma").value = ""; $("#dn-ma").focus(); $("#dn-loi").textContent = j.loi; return; }
+      $("#dn-mk").value = ""; $("#dn-ma").value = ""; $("#dn-ma").classList.add("an"); $("#dn-loi").textContent = ""; VAI = j.vai; TEN = j.ten; return batDau();
+    } catch (e2) { $("#dn-loi").textContent = "❌ " + e2.message; } finally { nut.disabled = false; }
+    return;
   }
-  KEY = null;
-  throw new Error("Sai khoá trang. Khoá có dạng xxxx-xxxx-xxxx-xxxx (16 chữ/số, 3 gạch ngang) trong file KHOA-TRANG-GITHUB.txt — KHÔNG phải mật khẩu đăng nhập. Mật khẩu gõ ở ô thứ 2.");
-}
-$("#dn").onsubmit = async (e) => {
-  e.preventDefault();
-  const nut = $("#dn-nut"), tt = $("#dn-tt"); nut.disabled = true;
-  try {
-    const k = await moKhoa($("#khoa").value);
-    $("#khoa").value = k;
-    if ($("#nho").checked) localStorage.setItem("khoa_trang", k); else localStorage.removeItem("khoa_trang");
-    sessionStorage.setItem("khoa_trang", k);
-    const kq = await gui({ dang_nhap: { mat_khau: $("#mk").value, ma: $("#ma").value } }, (m) => (tt.textContent = m));
-    if (kq.can_ma) { $("#ma").classList.remove("an"); $("#ma").focus(); tt.textContent = kq.loi; return; }
-    if (kq.loi) throw new Error(kq.loi);
-    sessionStorage.setItem("phien", kq.phien); sessionStorage.setItem("ai", JSON.stringify({ ten: kq.ten, vai: kq.vai }));
-    vao();
-  } catch (e2) { tt.textContent = "❌ " + e2.message; }
-  finally { nut.disabled = false; }
+  const r = await fetch("/quan-ly/api/dang-nhap", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ mat_khau: $("#dn-mk").value, ma: $("#dn-ma").value }) });
+  const j = await r.json().catch(() => ({}));
+  if (r.ok) { $("#dn-mk").value = ""; $("#dn-ma").value = ""; $("#dn-ma").classList.add("an"); VAI = j.vai; TEN = j.ten; return batDau(); }
+  if (j.can_ma) { $("#dn-ma").classList.remove("an"); $("#dn-ma").value = ""; $("#dn-ma").focus(); }
+  $("#dn-loi").textContent = j.loi || "Lỗi " + r.status;
 };
-$("#thoat").onclick = () => { sessionStorage.clear(); location.reload(); };
+$("#h-thoat").onclick = async () => { await api("dang-xuat", {}).catch(() => {}); hienDangNhap(); };
+$("#h-tamdung").onclick = () => lam(() => api("tam-dung", { bat: !D.tam_dung }), D.tam_dung ? "Bot trả lời lại bình thường" : "Đã tạm dừng: bot chỉ trả lời chủ bot");
+$("#h-kdl").onclick = async () => {
+  if (!confirm("Khởi động lại bot? Bot im khoảng 1 phút (Render deploy: ~3 phút).")) return;
+  try { const r = await api("khoi-dong-lai", {}); bao(`Đang khởi động lại… chờ ~${r.cho_giay} giây`); setTimeout(tai, r.cho_giay * 1000); } catch (e) { bao(e.message, true); }
+};
 
-const gio = (v) => (v ? new Date(v).toLocaleString("vi-VN") : "—");
-async function xemTT() {
-  const o = $("#tt");
-  try {
-    const d = (await viec("du-lieu-nhap", {}, (m) => (o.textContent = m))).du_lieu || {};
-    o.innerHTML = "<table></table>";
-    const t = o.firstChild, dong = (a, b) => { const r = t.insertRow(); r.insertCell().textContent = a; r.insertCell().textContent = b; };
-    dong("Final Deal", d.deal ? `ngày ${d.deal.ngay || "?"} · nạp ${gio(d.deal.nap_luc)} · ${d.deal.by || ""}` : "chưa có");
-    dong("Room 9380", d.room ? `ngày ${d.room.date || "?"} · nạp ${gio(d.room.loadedAt)} · ${d.room.by || ""}` : "chưa có");
-    dong("Dashboard", d.dash ? `${d.dash.ky || ""} · ${gio(d.dash.luc)} · ${d.dash.ok ? "OK" : d.dash.buoc || ""}` : "—");
-  } catch (e) { o.textContent = "❌ " + e.message; }
+$("#tabs").onclick = (e) => { const k = e.target.dataset.k; if (k) { tab = k; dangSua = false; location.hash = k; ve(); } };
+
+// ================= VẼ =================
+function ve() {
+  for (const b of $("#tabs").children) b.classList.toggle("chon", b.dataset.k === tab);
+  for (const s of document.querySelectorAll("main section")) s.classList.toggle("an", s.dataset.tab !== tab);
+  if (!D) return;
+  if (VAI !== "chu") { $("#h-tt").textContent = TEN + " · nhập số liệu"; $("#h-cham").className = "cham on"; return veNap(); }
+  const b = D.bot;
+  $("#h-cham").className = "cham " + (b.zalo ? "on" : "off");
+  $("#h-tt").textContent = b.zalo ? "Đang chạy" : "Mất kết nối Zalo";
+  $("#h-tamdung").textContent = D.tam_dung ? "▶ Tiếp tục trả lời" : "⏸ Tạm dừng";
+  $("#h-tamdung").classList.toggle("do", D.tam_dung);
+  $("#h-kdl").classList.toggle("chinh", D.can_khoi_dong_lai.length > 0);
+  if (dangSua && ["nguoi", "nhom", "cai", "gui", "nap", "tk", "luu"].includes(tab)) return;   // đang gõ: không vẽ lại đè chữ
+  ({ tong: veTong, nap: veNap, nguoi: veNguoi, nhom: veNhom, gui: veGui, tk: veTk, cai: veCai, log: veLog, luu: veLuu })[tab]();
 }
-// ---------- BẢN SAO TRÊN TRÌNH DUYỆT (mã hoá bằng khoá của bot — chỉ bot giải được) ----------
-// Render xoá ổ đĩa mỗi lần deploy -> mỗi lần đăng nhập đưa bản sao máy này lên (bot gộp, giữ MỚI NHẤT từng mục), rồi lấy bản mới về giữ.
+
+function veTong() {
+  const b = D.bot, n = b.nhip || {};
+  const ngay = new Date(), ngayThang = ngay.getDate(), soNgay = new Date(ngay.getFullYear(), ngay.getMonth() + 1, 0).getDate();
+  const botThe = (b.bots || []).map((x) => {
+    const pct = Math.min(100, x.tin_thang / 30), du = Math.round(x.tin_thang / Math.max(1, ngayThang) * soNgay);
+    const mau = x.het_han_muc || pct > 85 ? "do" : pct > 60 ? "vang" : "";
+    const soNhom = D.nhom.filter((g) => g.bot === x.so && ["san", "bat"].includes(g.trang_thai)).length, soNguoi = D.nguoi.filter((p) => p.bot === x.so).length;
+    return `<div class="the"><h3>Bot ${x.so} — ${esc(x.ten || x.account_name)} ${x.ket_noi === false ? chip("mất kết nối", "do") : chip("đang chạy", "xanh")}</h3>
+      <div class="so">${x.tin_thang.toLocaleString("vi")} <span class="nho">/ 3.000 tin tháng ${esc(String(b.thang || "").slice(5))}</span></div>
+      <div class="thanh"><i class="${mau}" style="width:${pct}%"></i></div>
+      <div class="nho">${x.het_han_muc ? `<b style="color:var(--do)">Zalo báo HẾT hạn mức</b> ${tg(x.het_info?.luc)}${x.het_info?.loi ? ` (${esc(x.het_info.loi)})` : ""}` : `Dự báo cuối tháng ≈ <b>${du.toLocaleString("vi")}</b> tin ${du > 3000 ? "<b style='color:var(--do)'>(VƯỢT)</b>" : ""}`}<br>${soNhom}/3 nhóm đang bật · ${soNguoi}/50 người · <a href="#nguoi" class="loc-bot" data-bot="${x.so}">xem</a></div></div>`;
+  }).join("");
+  const nguoi = D.nguoi.length, nhomBat = D.nhom.filter((g) => ["san", "bat"].includes(g.trang_thai)).length;
+  const moi = D.nhom.filter((g) => g.trang_thai === "chua");
+  const top = [...D.nguoi].sort((a, b) => b.so_tin - a.so_tin).slice(0, 6);
+  $('[data-tab=tong]').innerHTML = `
+    ${D.canh_bao.map((c) => `<div class="bao ${/MẤT|HẾT|lỗi/i.test(c) ? "do" : ""}">⚠ ${esc(c)}</div>`).join("")}
+    ${D.tam_dung ? `<div class="bao do">⏸ Bot đang TẠM DỪNG — chỉ trả lời chủ bot.</div>` : ""}
+    ${moi.length ? `<div class="bao xanh">🆕 ${moi.length} nhóm mới đã tag bot nhưng chưa bật — vào tab <b>Nhóm</b> để bật.</div>` : ""}
+    <div class="luoi">
+      <div class="the"><h3>Trạng thái</h3>
+        <div class="so" style="color:${b.zalo ? "var(--xanh)" : "var(--do)"}">${b.zalo ? "● Đang chạy" : "● Mất kết nối"}</div>
+        <div class="nho">Chạy liên tục: <b>${phut(b.uptime_min)}</b><br>Nơi chạy: <b>${D.moi_truong === "render" ? "Render (máy chủ)" : "Máy tính"}</b>${b.ban ? ` · bản ${esc(b.ban)}` : ""}<br>RAM: ${b.ram_mb} MB${D.moi_truong === "render" ? " / 512" : ""}</div></div>
+      ${botThe}
+      <div class="the"><h3>Nhịp gửi tin</h3><div class="so">${n.ngay_24h ?? 0} <span class="nho">tin / 24 giờ</span></div>
+        <div class="nho">1 giờ qua: <b>${n.gio ?? 0}</b> · phút này: <b>${n.phut ?? 0}</b> · đông nhất: ${n.max_1_phut ?? 0}/phút<br>Đang chờ gửi: ${n.hang_doi ?? 0}</div></div>
+      <div class="the"><h3>Danh bạ</h3><div class="so">${nguoi} <span class="nho">người</span> · ${D.nhom.length} <span class="nho">nhóm</span></div>
+        <div class="nho">${nhomBat} nhóm đang bật · ${D.nguoi.filter((p) => p.ten_goi).length} người đã đặt tên gọi · ${D.nguoi.filter((p) => p.chan).length} bị chặn</div></div>
+    </div>
+    <div class="luoi" style="margin-top:14px">
+      <div class="the"><h3>Hỏi nhiều nhất</h3>${top.length ? `<table>${top.map((p) => `<tr><td>${esc(p.ten_goi || p.ten_zalo)}</td><td class="nho">bot ${p.bot}</td><td style="text-align:right"><b>${p.so_tin}</b></td></tr>`).join("")}</table>` : `<p class="nho">Chưa có ai nhắn.</p>`}</div>
+      <div class="the"><h3>Mới hoạt động</h3>${[...D.nguoi].sort((a, b) => (b.cuoi || 0) - (a.cuoi || 0)).slice(0, 6).map((p) => `<div>${esc(p.ten_goi || p.ten_zalo)} <span class="nho">— ${tg(p.cuoi)}</span></div>`).join("") || `<p class="nho">—</p>`}</div>
+      <div class="the"><h3>Bật / tắt gần đây</h3>${(D.su_kien || []).slice(0, 8).map((x) => `<div class="nho" style="padding:2px 0">${/dừng|Mất|Lỗi/i.test(x.msg) ? "🔴" : /kết nối lại/i.test(x.msg) ? "🟡" : "🟢"} <b>${new Date(x.luc).toLocaleString("vi-VN", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}</b> ${esc(x.msg.replace(/ lúc \d.*?(?=[.(,]|$)/, ""))}</div>`).join("") || `<p class="nho">Chưa có</p>`}</div>
+      <div class="the"><h3>🔒 Dữ liệu được mã hoá AES-256</h3><div class="nho">File lưu trên bot và bản sao trên máy mày đều mã hoá <b>AES-256-GCM</b> · đường truyền HTTPS · đăng nhập 2 cấp, mật khẩu băm scrypt · số liệu mật không gửi AI.<br><a href="#luu" class="xem-bm">Xem chi tiết</a></div></div>
+    </div>`;
+}
+
+// lọc theo bot (0 = tất cả) — dùng chung tab Người dùng / Nhóm
+let locBot = 0;
+const nutBot = () => { const ds = (D.bot?.bots || []).map((b) => b.so); if (ds.length < 2) return ""; return [0, ...ds].map((so) => `<button class="nut nho ${locBot === so ? "chinh" : ""} chon-bot" data-bot="${so}">${so ? `Bot ${so} · ${esc((D.bot.bots.find((b) => b.so === so) || {}).ten || "")}` : "Tất cả"}</button>`).join(""); };
+document.addEventListener("click", (e) => { if (e.target.closest(".xem-bm")) { e.preventDefault(); tab = "luu"; location.hash = "luu"; ve(); return; } const b = e.target.closest(".chon-bot,.loc-bot"); if (!b) return; e.preventDefault(); locBot = Number(b.dataset.bot); if (b.classList.contains("loc-bot")) { tab = "nguoi"; location.hash = "nguoi"; } dangSua = false; ve(); });
+const chip = (t, m = "") => `<span class="the-chip ${m}">${t}</span>`;
+let locNguoi = "";
+function veNguoi() {
+  const q = locNguoi.toLowerCase();
+  const ds = D.nguoi.filter((p) => (!locBot || p.bot === locBot) && (!q || [p.ten_zalo, p.ten_goi, p.uid, p.ghi_chu].some((x) => String(x || "").toLowerCase().includes(q))))
+    .sort((a, b) => (b.cuoi || 0) - (a.cuoi || 0));
+  const tenNhom = (id) => D.nhom.find((g) => g.id === id)?.ten || id.slice(0, 10) + "…";
+  $('[data-tab=nguoi]').innerHTML = `
+    <div class="thanh-cong">${nutBot()}<input type="search" id="n-loc" placeholder="Tìm tên, UID, ghi chú…" value="${esc(locNguoi)}">
+      <span class="nho">${ds.length} người · Tên gọi đổi là bot dùng <b>ngay</b>. Người dùng cũng tự nhắn được: <i>"gọi tôi là anh Phương"</i></span></div>
+    <div class="bao xanh" style="font-size:13px">Mỗi người có UID KHÁC NHAU ở bot 1 và bot 2 → nếu 1 người dùng cả 2 bot thì đặt tên cho cả 2 dòng.</div>
+    <div class="bang"><table><thead><tr><th>Tên Zalo</th><th style="min-width:190px">Tên gọi (bot xưng hô)</th><th>Ghi chú</th><th>Bot</th><th>Nhóm</th><th>Tin</th><th>Lần cuối</th><th>Quyền</th><th></th></tr></thead><tbody>
+    ${ds.map((p) => `<tr data-uid="${esc(p.uid)}">
+      <td><b>${esc(p.ten_zalo || "?")}</b><div class="ma">${esc(p.uid)}</div></td>
+      <td><input type="text" class="n-ten" value="${esc(p.ten_goi)}" placeholder="vd: anh Phương" maxlength="40">
+        <div class="goi-y">${["anh", "chị", "em", "bạn", "sếp"].map((x) => `<button class="nut nho n-goiy" data-x="${x}">${x}</button>`).join("")}</div></td>
+      <td><input type="text" class="n-ghi" value="${esc(p.ghi_chu)}" placeholder="ghi chú nội bộ" maxlength="60"></td>
+      <td>${p.bot}</td>
+      <td>${(p.nhom || []).map((g) => chip(esc(tenNhom(g)))).join("") || (p.rieng ? chip("chat riêng") : "—")}</td>
+      <td>${p.so_tin}</td><td class="nho">${tg(p.cuoi)}</td>
+      <td>${p.chu_goc ? chip("Chủ bot gốc", "chinh") : `<label class="nho"><input type="checkbox" class="n-chu" ${p.chu ? "checked" : ""}> chủ bot</label>`}<br>
+        <label class="nho"><input type="checkbox" class="n-rieng" ${p.rieng_them || p.chu ? "checked" : ""} ${p.chu ? "disabled" : ""}> chat riêng</label><br>
+        <label class="nho"><input type="checkbox" class="n-deal" ${p.xem_deal || p.chu ? "checked" : ""} ${p.chu ? "disabled" : ""}> xem deal</label><br>
+        <label class="nho" style="color:var(--do)"><input type="checkbox" class="n-chan" ${p.chan ? "checked" : ""}> chặn</label></td>
+      <td><button class="nut nho chinh n-luu">Lưu</button></td></tr>`).join("") || `<tr><td colspan="9" class="nho">Chưa có ai nhắn bot. Người dùng nhắn riêng / tag bot trong nhóm là hiện ở đây.</td></tr>`}
+    </tbody></table></div>`;
+  const s = $('[data-tab=nguoi]');
+  $("#n-loc", s).oninput = (e) => { locNguoi = e.target.value; dangSua = false; veNguoi(); $("#n-loc").focus(); };
+  s.oninput = (e) => { if (e.target.matches(".n-ten,.n-ghi")) dangSua = true; };
+  s.onclick = (e) => {
+    const tr = e.target.closest("tr[data-uid]"); if (!tr) return;
+    if (e.target.matches(".n-goiy")) {
+      const o = $(".n-ten", tr), ten = o.value.replace(/^(anh|chị|em|bạn|sếp)\s+/i, "");
+      o.value = e.target.dataset.x + " " + (ten || (D.nguoi.find((p) => p.uid === tr.dataset.uid)?.ten_zalo || "").split(" ").pop());
+      dangSua = true; o.focus();
+    }
+    if (e.target.matches(".n-luu")) {
+      dangSua = false;
+      const chuO = $(".n-chu", tr);
+      lam(() => api("nguoi", { uid: tr.dataset.uid, ten_goi: $(".n-ten", tr).value, ghi_chu: $(".n-ghi", tr).value, chan: $(".n-chan", tr).checked,
+        ...(chuO ? { chu: chuO.checked } : {}), rieng: $(".n-rieng", tr).checked, deal: $(".n-deal", tr).checked }), "Đã lưu — bot dùng ngay");
+    }
+  };
+}
+
+const TT_NHOM = { san: ["Chạy đủ", "xanh"], bat: ["Đã bật (phải tag)", "chinh"], tat: ["Đã tắt", "do"], chua: ["Chưa bật", "vang"] };
+function veNhom() {
+  const room = D.du_lieu?.room_nhom || [], dealN = D.du_lieu?.deal_nhom || [], cbN = D.du_lieu?.canh_bao_nhom || [];
+  const tenBot = (so) => esc((D.bot?.bots || []).find((b) => b.so === so)?.ten || `Bot ${so}`);
+  const ds = [...D.nhom].filter((g) => !locBot || g.bot === locBot).sort((a, b) => (a.trang_thai === "chua" ? -1 : 0) - (b.trang_thai === "chua" ? -1 : 0) || (b.cuoi || 0) - (a.cuoi || 0));
+  const o = (cls, bat, title) => `<td style="text-align:center"><input type="checkbox" class="gq ${cls}" ${bat ? "checked" : ""} title="${title}"></td>`;
+  $('[data-tab=nhom]').innerHTML = `
+    <div class="thanh-cong">${nutBot()}</div>
+    <div class="bao xanh" style="font-size:13px">Tick là có hiệu lực <b>ngay</b>, không cần khởi động lại. Bỏ tick để chống spam:
+      <b>Chat</b> = trả lời câu hỏi bằng AI · <b>Tra mã</b> = thẻ mã CK, <i>full</i> · <b>Cảnh báo giá</b> = nhận tin mã giảm mạnh (chọn được nhiều nhóm, cả 2 bot) ·
+      <b>Room / Deal</b> = số liệu MẬT.<br>Cảnh báo giá đang gửi tới: <b>${cbN.map((id) => esc(D.nhom.find((g) => g.id === id)?.ten || id)).join(", ") || "không nhóm nào"}</b></div>
+    <p class="nho">Mỗi bot gói miễn phí tối đa 3 nhóm. Thêm nhóm mới: thêm bot vào nhóm trên Zalo → trong nhóm tag bot 1 lần → nhóm hiện ở đây.</p>
+    <div class="bang"><table><thead><tr><th style="min-width:200px">Tên nhóm</th><th>Bot</th><th>Trạng thái</th>
+      <th style="text-align:center">Chat</th><th style="text-align:center">Tra mã</th><th style="text-align:center">Cảnh báo giá</th><th style="text-align:center">Room</th><th style="text-align:center">Deal</th>
+      <th>Tin</th><th>Lần cuối</th><th>Việc</th></tr></thead><tbody>
+    ${ds.map((g) => { const [t, m] = TT_NHOM[g.trang_thai] || [g.trang_thai, ""]; const q = g.quyen || { chat: true, tra: true, canh_bao: cbN.includes(g.id) }; return `<tr data-id="${esc(g.id)}">
+      <td><input type="text" class="g-ten" value="${esc(g.ten)}" placeholder="Zalo không gửi tên — gõ tên nhóm, bấm Lưu tên" maxlength="50"><div class="ma">${esc(g.id)}${!g.ten && g.nguoi_cuoi ? ` · người tag gần nhất: ${esc(g.nguoi_cuoi)}` : ""}</div></td>
+      <td>${tenBot(g.bot)}</td><td>${chip(t, m)}</td>
+      ${o("q-chat", q.chat, "Trả lời câu hỏi bằng AI")}${o("q-tra", q.tra, "Tra thẻ mã CK, full")}${o("q-cb", q.canh_bao, "Nhận cảnh báo giá")}${o("q-room", room.includes(g.id), "Tra room 9380 (MẬT)")}${o("q-deal", dealN.includes(g.id), "Tra deal / lãi suất (MẬT)")}
+      <td>${g.so_tin || 0}</td><td class="nho">${tg(g.cuoi)}${g.nguoi_cuoi ? `<br>${esc(g.nguoi_cuoi)}` : ""}</td>
+      <td style="white-space:nowrap"><button class="nut nho g-luu">Lưu tên</button>
+        ${g.trang_thai === "tat" || g.trang_thai === "chua" ? `<button class="nut nho chinh g-bat">Bật</button>` : `<button class="nut nho do g-tat">Tắt hẳn</button>`}</td></tr>`; }).join("") || `<tr><td colspan="11" class="nho">Chưa có nhóm.</td></tr>`}
+    </tbody></table></div>`;
+  const s = $('[data-tab=nhom]');
+  s.oninput = (e) => { if (e.target.matches(".g-ten")) dangSua = true; };
+  s.onchange = (e) => {
+    const c = e.target; if (!c.matches(".gq")) return;
+    const id = c.closest("tr").dataset.id, bat = c.checked;
+    if ((c.matches(".q-room") || c.matches(".q-deal")) && bat && !confirm("Số liệu MẬT. Cho nhóm này tra?")) { c.checked = false; return; }
+    const body = c.matches(".q-room") ? { id, room: bat } : c.matches(".q-deal") ? { id, deal: bat }
+      : { id, quyen: { [c.matches(".q-chat") ? "chat" : c.matches(".q-tra") ? "tra" : "canh_bao"]: bat } };
+    lam(() => api("nhom", body), "Đã lưu — có hiệu lực ngay");
+  };
+  s.onclick = (e) => {
+    const tr = e.target.closest("tr[data-id]"); if (!tr) return; const id = tr.dataset.id;
+    if (e.target.matches(".g-luu")) { dangSua = false; lam(() => api("nhom", { id, ten: $(".g-ten", tr).value }), "Đã lưu tên nhóm"); }
+    if (e.target.matches(".g-bat")) lam(() => api("nhom", { id, viec: "bat", ten: $(".g-ten", tr).value }), "Đã bật nhóm");
+    if (e.target.matches(".g-tat") && confirm("Tắt hẳn bot trong nhóm này (không trả lời gì, kể cả tra mã)?")) lam(() => api("nhom", { id, viec: "tat" }), "Đã tắt nhóm");
+  };
+}
+
+function veGui() {
+  const nhom = D.nhom.filter((g) => ["san", "bat"].includes(g.trang_thai));
+  const nguoi = D.nguoi.filter((p) => p.rieng && !p.chan);
+  $('[data-tab=gui]').innerHTML = `<div class="the" style="max-width:720px">
+    <h3>Gửi tin từ bot</h3>
+    <p class="nho">Mỗi tin tính vào hạn mức 3.000 tin/tháng. Nhắn riêng chỉ được cho người đã từng nhắn riêng bot.</p>
+    <p><select id="g-toi"><option value="">— Chọn nơi nhận —</option>
+      <optgroup label="Nhóm">${nhom.map((g) => `<option value="${esc(g.id)}">${esc(g.ten || g.id)} (bot ${g.bot})</option>`).join("")}</optgroup>
+      <optgroup label="Người (chat riêng)">${nguoi.map((p) => `<option value="${esc(p.uid)}">${esc(p.ten_goi || p.ten_zalo)} (bot ${p.bot})</option>`).join("")}</optgroup></select></p>
+    <p><textarea id="g-nd" rows="6" placeholder="Nội dung… Dùng {ten} để chèn tên gọi người nhận"></textarea></p>
+    <div class="thanh-cong"><span class="nho">Mẫu nhanh:</span>
+      ${["Thông báo: ", "Dạ {ten}, ", "Nhắc lịch: ", "Bot sẽ bảo trì lúc "].map((m) => `<button class="nut nho g-mau">${esc(m)}</button>`).join("")}</div>
+    <p><button class="nut chinh" id="g-gui">Gửi</button> <span class="nho" id="g-dem"></span></p></div>`;
+  const s = $('[data-tab=gui]');
+  s.oninput = () => { dangSua = !!$("#g-nd").value; $("#g-dem").textContent = $("#g-nd").value.length ? `${$("#g-nd").value.length} ký tự ≈ ${Math.max(1, Math.ceil($("#g-nd").value.length / 2000))} tin` : ""; };
+  s.onclick = (e) => {
+    if (e.target.matches(".g-mau")) { $("#g-nd").value += e.target.textContent; $("#g-nd").focus(); dangSua = true; }
+    if (e.target.id === "g-gui") {
+      const toi = $("#g-toi").value; let nd = $("#g-nd").value.trim();
+      if (!toi || !nd) return bao("Chọn nơi nhận và nhập nội dung", true);
+      const p = D.nguoi.find((x) => x.uid === toi);
+      nd = nd.replaceAll("{ten}", p?.ten_goi || p?.ten_zalo || "mọi người");
+      if (!confirm("Gửi tin này?\n\n" + nd.slice(0, 300))) return;
+      lam(() => api("gui", { chat_id: toi, text: nd }), "Đã gửi").then((r) => { if (r) { $("#g-nd").value = ""; dangSua = false; } });
+    }
+  };
+}
+
+function veCai() {
+  const nhom = {};
+  for (const b of D.bien) (nhom[b.nhom] ??= []).push(b);
+  const sua = D.sua_cai_dat;
+  $('[data-tab=cai]').innerHTML = `
+    ${sua ? "" : `<div class="bao">Bot đang chạy trên Render nhưng chưa có <b>RENDER_API_KEY</b> → trang này chỉ XEM được. Muốn sửa từ đây: Render → Account Settings → API Keys → tạo key → dán vào biến RENDER_API_KEY của service (làm 1 lần). Hoặc sửa thẳng trên dashboard Render.</div>`}
+    <p class="nho">Ô bí mật (token, key) chỉ hiện vài ký tự; để trống = giữ nguyên. Gõ <b>__XOA__</b> để xoá biến. Sửa xong bấm <b>Lưu</b> rồi <b>Khởi động lại</b>.</p>
+    ${Object.entries(nhom).map(([t, ds]) => `<div class="the form-nhom"><h4>${esc(t)}</h4>${ds.map((b) => `
+      <div class="dong-bien"><div class="k">${esc(b.mo_ta)}<small class="ma">${b.k}${b.da_doi ? " · <b style='color:var(--vang)'>chưa áp dụng</b>" : ""}</small></div>
+        <input ${b.bi_mat ? 'type="password" autocomplete="new-password"' : 'type="text"'} data-k="${b.k}" value="${b.bi_mat ? "" : esc(b.gia_tri)}" placeholder="${b.bi_mat ? (b.co ? "đã có: " + esc(b.gia_tri) : "chưa có") : "(trống)"}" ${sua ? "" : "disabled"}>
+        <span>${b.k === "ZBOT_TOKEN" || b.k === "ZBOT_TOKEN_2" ? `<button class="nut nho c-kiem" data-loai="zalo" data-k="${b.k}">Kiểm</button>` : b.k === "GEMINI_API_KEY" ? `<button class="nut nho c-kiem" data-loai="gemini" data-k="${b.k}">Kiểm</button>` : ""}</span>
+      </div>`).join("")}</div>`).join("")}
+    ${sua ? `<p><button class="nut chinh" id="c-luu">Lưu cài đặt</button></p>` : ""}`;
+  const s = $('[data-tab=cai]');
+  s.oninput = () => { dangSua = true; };
+  s.onclick = async (e) => {
+    if (e.target.matches(".c-kiem")) {
+      const o = $(`input[data-k="${e.target.dataset.k}"]`, s);
+      try { const r = await api("kiem", { loai: e.target.dataset.loai, bien: e.target.dataset.k, gia_tri: o.value }); bao(r.ket_qua, !r.ok); } catch (er) { bao(er.message, true); }
+    }
+    if (e.target.id === "c-luu") {
+      const doi = {};
+      for (const o of s.querySelectorAll("input[data-k]")) {
+        const b = D.bien.find((x) => x.k === o.dataset.k);
+        if (b.bi_mat ? o.value !== "" : o.value !== b.gia_tri) doi[o.dataset.k] = o.value;
+      }
+      if (!Object.keys(doi).length) return bao("Không có gì thay đổi");
+      dangSua = false;
+      await lam(() => api("bien", { doi }), `Đã lưu ${Object.keys(doi).length} mục — bấm Khởi động lại để áp dụng`);
+    }
+  };
+}
+
+let locLog = "", tuDong = true;
+async function veLog() {
+  const s = $('[data-tab=log]');
+  if (!$("#l-hop", s)) {
+    s.innerHTML = `<div class="thanh-cong"><select id="l-loai" style="max-width:160px"><option value="">Tất cả</option><option value="loi">Chỉ lỗi / cảnh báo</option><option value="tin">Tin nhắn</option></select>
+      <input type="search" id="l-tim" placeholder="Lọc chữ…"><label class="nho"><input type="checkbox" id="l-tu" checked> tự cập nhật</label></div><div class="log" id="l-hop"></div>`;
+    $("#l-loai", s).onchange = $("#l-tim", s).oninput = () => veLog();
+    $("#l-tu", s).onchange = (e) => { tuDong = e.target.checked; };
+  }
+  let ds;
+  try { ds = (await api("nhat-ky")).dong; } catch (e) { return; }
+  const loai = $("#l-loai", s).value, tim = $("#l-tim", s).value.toLowerCase();
+  if (loai === "loi") ds = ds.filter((d) => d.m !== "log" || /lỗi|error|⚠️|💥|🛑|429|401|mất kết nối/i.test(d.s));
+  if (loai === "tin") ds = ds.filter((d) => /^\[|🤖|->|📤|📛/.test(d.s));
+  if (tim) ds = ds.filter((d) => d.s.toLowerCase().includes(tim));
+  const h = $("#l-hop", s), cuoi = h.scrollTop + h.clientHeight >= h.scrollHeight - 30;
+  h.innerHTML = ds.slice(-500).map((d) => `<div class="${d.m}"><span class="t">${esc(d.t)}</span> ${esc(d.s)}</div>`).join("") || "<span class='t'>(trống)</span>";
+  if (cuoi) h.scrollTop = h.scrollHeight;
+}
+
+function veLuu() {
+  $('[data-tab=luu]').innerHTML = `
+    <div class="the" style="max-width:980px">
+      <h3>🔒 Số liệu được bảo vệ thế nào</h3>
+      <table class="bang-bm">
+        <tr><td><b>Đăng nhập</b></td><td>2 cấp: <b>chủ</b> (toàn quyền) và <b>nhập số liệu</b> (chỉ kéo thả file + lấy Fiin, không xem / tra được gì).
+          Mật khẩu người nhập số liệu được băm <b>scrypt</b> trước khi lưu — không ai đọc lại được, kể cả chủ.
+          Mỗi lần mở / tải lại trang phải đăng nhập lại; đóng trình duyệt là hết phiên. Sai 5 lần → khoá IP đó 15 phút.
+          Khoá / xoá tài khoản là mất quyền ngay.</td></tr>
+        <tr><td><b>Đường truyền</b></td><td>Mọi dữ liệu giữa trình duyệt và bot đi qua <b>HTTPS</b> (mã hoá TLS). Phiên đăng nhập là cookie <b>HttpOnly + SameSite=Strict</b>, ký <b>HMAC-SHA256</b>:
+          trang web khác không đọc / giả được, không lợi dụng được để ra lệnh thay mày. Trang không cho nhúng vào web khác.</td></tr>
+        <tr><td><b>Trên máy chủ bot</b></td><td>File lưu trên ổ đĩa của bot (<code>bot-data.json</code>) được <b>mã hoá AES-256-GCM</b> — lấy được file cũng không đọc được; ổ đĩa đó còn <b>bị xoá sạch mỗi lần bot khởi động lại</b>.
+          Lúc bot đang trả lời thì số liệu phải ở dạng đọc được trong bộ nhớ của bot (không có cách nào khác), bộ nhớ đó không mở ra Internet.
+          File Deal 10 MB <b>không gửi lên</b> — trình duyệt tự đọc, chỉ gửi bảng tóm tắt các nhóm. File 9380: bot đọc xong chỉ giữ số liệu từng mã, không giữ file.
+          Không lưu ở GitHub hay dịch vụ lưu trữ nào khác.</td></tr>
+        <tr><td><b>Bản sao trên máy mày</b></td><td>Trình duyệt giữ 1 bản sao để bot khởi động lại thì tự nạp lại. Bản sao được mã hoá <b>AES-256-GCM</b> (có mã xác thực chống sửa)
+          bằng khoá <code>KHO_KHOA</code> chỉ nằm trên bot: người dùng máy đó mở ra cũng chỉ thấy chuỗi vô nghĩa, sửa 1 ký tự là bot từ chối.</td></tr>
+        <tr><td><b>Trên Zalo</b></td><td>Room 9380 và Deal / lãi suất là số liệu MẬT: chỉ trả lời trong nhóm được tick (tab Nhóm) và chủ bot chat riêng.
+          Số liệu mật <b>không bao giờ gửi cho AI (Gemini)</b>. Từng nhóm tắt được chat / tra mã / cảnh báo để chống spam.</td></tr>
+        <tr><td><b>Token, key</b></td><td>Token bot, key Gemini, mật khẩu… chỉ nằm trong biến môi trường của Render, trang này chỉ hiện 4 ký tự đầu-cuối.</td></tr>
+        <tr><td><b>Dấu vết</b></td><td>Nhật ký ghi lại ai đăng nhập (IP), ai nạp file, ai tra số liệu mật, mọi lần đăng nhập sai.</td></tr>
+      </table>
+    </div>
+    <div class="luoi" style="margin-top:14px">
+    <div class="the"><h3>🔐 Google Authenticator (chủ)</h3><div id="g2fa"></div></div>
+    <div class="the"><h3>🔑 Đổi mật khẩu chủ</h3>
+      <p><input type="password" id="mk-cu" placeholder="Mật khẩu hiện tại" autocomplete="current-password"></p>
+      <p><input type="password" id="mk-moi" placeholder="Mật khẩu mới (từ 5 ký tự)" autocomplete="new-password"></p>
+      <p><input type="password" id="mk-moi2" placeholder="Gõ lại mật khẩu mới" autocomplete="new-password"></p>
+      ${D.chu_2fa ? `<p><input type="text" id="mk-ma" inputmode="numeric" maxlength="7" placeholder="Mã 6 số Google Authenticator"></p>` : ""}
+      <p><button class="nut chinh" id="mk-doi">Đổi mật khẩu</button></p><div id="mk-kq"></div></div>
+    <div class="the"><h3>Tải bản sao lưu (đã mã hoá)</h3><p class="nho">Gồm tên gọi, ghi chú, tên nhóm, quyền, tài khoản, danh bạ, đếm tin, số liệu đã nạp. File <b>mã hoá AES-256</b>, chỉ bot này mở được — cất ở đâu cũng được.</p>
+      <button class="nut chinh" id="s-tai">Tải về</button></div>
+    <div class="the"><h3>Nạp bản sao lưu</h3><p class="nho">Bot gộp: mục nào trong file <b>mới hơn</b> thì lấy, cũ hơn thì giữ cái đang có.</p>
+      <input type="file" id="s-file" accept=".json,.bak"><p><button class="nut" id="s-nap">Nạp</button></p></div>
+  </div>`;
+  ve2FA();
+  $("#mk-doi").onclick = async () => {
+    const moi = $("#mk-moi").value;
+    if (moi !== $("#mk-moi2").value) return bao("2 lần gõ mật khẩu mới không giống nhau", true);
+    try {
+      const r = await api("doi-mk-chu", { cu: $("#mk-cu").value, moi, ma: $("#mk-ma")?.value });
+      for (const id of ["#mk-cu", "#mk-moi", "#mk-moi2"]) $(id).value = "";
+      $("#mk-kq").innerHTML = `<div class="bao ${r.can_dan ? "" : "xanh"}">${esc(r.ket_qua)}</div>`;
+      setTimeout(() => hienDangNhap("Đã đổi mật khẩu — đăng nhập lại bằng mật khẩu mới."), r.can_dan ? 15000 : 2500);
+    } catch (e) { bao(e.message, true); }
+  };
+  $("[data-tab=luu]").oninput = () => { dangSua = true; };
+  $("#s-tai").onclick = async () => {
+    try {
+      const r = await api("ban-sao");
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([JSON.stringify({ loai: "bot-zalo-ban-sao", luc: r.luc, blob: r.blob })], { type: "application/json" }));
+      a.download = `bot-zalo-ban-sao-${new Date().toISOString().slice(0, 10)}.json`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+    } catch (e) { bao(e.message, true); }
+  };
+  $("#s-nap").onclick = async () => {
+    const f = $("#s-file").files[0]; if (!f) return bao("Chọn file trước", true);
+    let o; try { o = JSON.parse(await f.text()); } catch { return bao("File không đúng", true); }
+    if (!o.blob) return bao("Không phải file sao lưu của bot", true);
+    lam(() => api("khoi-phuc", { blob: o.blob }).then((r) => { bao(r.lay?.length ? "Đã lấy: " + r.lay.join(", ") : "Không có gì mới hơn số liệu đang có"); return r; }));
+  };
+}
+
+// ================= NẠP DỮ LIỆU (kéo thả) — bot nhớ, KHÔNG nhắn Zalo =================
+let xlsxSan = null;
+const napXlsx = () => (xlsxSan ??= new Promise((ok, loi) => { const s = document.createElement("script"); s.src = window.GH ? "xlsx.full.min.js" : "/quan-ly/xlsx.js"; s.onload = () => (window.XLSX ? ok(window.XLSX) : loi(new Error("bộ đọc Excel hỏng"))); s.onerror = () => loi(new Error("không tải được bộ đọc Excel")); document.head.append(s); }).catch((e) => { xlsxSan = null; throw e; }));
+const b64 = (ab) => { const u = new Uint8Array(ab); let s = ""; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
+let napDang = false;
+async function napFile(f) {
+  if (napDang) return bao("Đang nạp file khác, chờ chút", true);
+  napDang = true;
+  const ghi = (m) => { const o = $("#nap-tt"); if (o) o.textContent = m; };
+  try {
+    let body;
+    if (/\.html?$/i.test(f.name)) {
+      ghi(`Đang gửi dashboard "${f.name}"… (kiểm + đẩy lên web)`);
+      body = { kieu: "dash", ten: f.name, text: await f.text() };
+    } else if (/\.xlsx?$/i.test(f.name)) {
+      ghi(`Đang đọc "${f.name}" trên máy này…`);
+      const ab = await f.arrayBuffer();
+      const XLSX = await napXlsx().catch(() => null);
+      if (!XLSX) {                                       // máy này không tải được bộ đọc → gửi nguyên file, bot tự đọc
+        if (f.size > 22 * 1048576) throw new Error("file quá 22 MB");
+        body = { kieu: "xlsx-tho", ten: f.name, base64: b64(ab) };
+        ghi("Máy này không đọc được Excel — gửi nguyên file để bot đọc…");
+      } else if (XLSX.read(ab, { type: "array", bookSheets: true }).SheetNames.includes("Tổng hợp nhóm")) {
+        const wb = XLSX.read(ab, { type: "array", sheets: ["Tổng hợp nhóm", "Tổng quan", "RAW 9385"] });
+        const r9 = wb.Sheets["RAW 9385"] ? XLSX.utils.sheet_to_json(wb.Sheets["RAW 9385"], { header: 1, defval: "", raw: true }) : null;
+        body = { kieu: "deal", ten: f.name, ...(r9 ? { raw_9385: r9.map((r) => [r[2], r[4]]), ngay_9385: r9[0]?.[3] } : {}),
+          rows: XLSX.utils.sheet_to_json(wb.Sheets["Tổng hợp nhóm"], { header: 1, defval: "", raw: true }),
+          tong_quan: wb.Sheets["Tổng quan"] ? XLSX.utils.sheet_to_json(wb.Sheets["Tổng quan"], { header: 1, defval: "", raw: false }).slice(0, 5) : [] };
+        ghi(`Đã đọc ${body.rows.length - 1} dòng nhóm KH — đang gửi lên bot…`);
+      } else {
+        if (f.size > 10 * 1048576) throw new Error("file 9380 quá 10 MB");
+        body = { kieu: "room", ten: f.name, base64: b64(ab) };
+        ghi("Đang gửi file room 9380…");
+      }
+    } else throw new Error("Chỉ nhận .html (dashboard) hoặc .xls/.xlsx (9380, Deal/Mass)");
+    const r = await api("nap-file", body);
+    ghi(r.ket_qua); bao("Bot đã nhớ — không nhắn Zalo");
+    await tai(); dongBo(D?.kho?.luc || 0, true);
+  } catch (e) { ghi("❌ " + e.message); bao(e.message, true); }
+  finally { napDang = false; }
+}
+const ngayGio = (v) => (v ? new Date(v).toLocaleString("vi-VN") : "—");
+
+function veNap() {
+  const s = $('[data-tab=nap]'), d = D.du_lieu || {}, fi = D.fiin;
+  const chu = VAI === "chu", dc = d.deal_cai || {};
+  if (!$("#nap-keo", s)) s.innerHTML = `
+    <div class="the" id="nap-keo" style="border:2px dashed #b9c2d3;text-align:center;padding:34px;cursor:pointer">
+      <div style="font-size:18px;font-weight:600">Kéo thả file vào đây (hoặc bấm để chọn)</div>
+      <div class="nho">Dashboard (.html) → tự kiểm + đẩy lên web · File 9380 (.xls) → room · File "Final Deal mass theo ngành" (.xlsx) → lãi suất / dư nợ<br>
+      Bot nhớ luôn, nạp file mới là thay. <b>Không nhắn gì vào Zalo.</b> File Deal 10 MB được đọc ngay trên máy này, chỉ gửi bảng gọn lên bot.</div>
+      <input type="file" id="nap-chon" accept=".html,.htm,.xls,.xlsx" class="an" multiple>
+      <p id="nap-tt" class="nho" style="margin:12px 0 0;font-weight:600"></p></div>
+    <div class="luoi" id="nap-the" style="margin-top:14px"></div>
+    <div id="nap-chu"></div>`;
+  const keo = $("#nap-keo", s);
+  keo.onclick = (e) => { if (e.target.id !== "nap-chon") $("#nap-chon", s).click(); };
+  $("#nap-chon", s).onchange = async (e) => { for (const f of e.target.files) await napFile(f); e.target.value = ""; };
+  keo.ondragover = (e) => { e.preventDefault(); keo.style.background = "var(--chinh-nhat)"; };
+  keo.ondragleave = () => { keo.style.background = ""; };
+  keo.ondrop = async (e) => { e.preventDefault(); keo.style.background = ""; for (const f of e.dataTransfer.files) await napFile(f); };
+
+  $("#nap-the", s).innerHTML = `
+    <div class="the"><h3>Deal / Mass</h3>${d.deal ? `<div class="so">${esc(d.deal.ngay || "?")}</div><div class="nho">dư nợ ngày · nạp ${ngayGio(d.deal.nap_luc)} · ${esc(d.deal.by || "")}${d.deal.so_nhom ? `<br>${d.deal.so_nhom} nhóm · ${d.deal.so_ma} mã · ${(d.deal.tong_du_no / 1e9).toLocaleString("vi", { maximumFractionDigits: 2 })} tỷ` : ""}</div>` : `<p class="nho">Chưa nạp</p>`}</div>
+    <div class="the"><h3>Room 9380</h3>${d.room ? `<div class="so">${esc(d.room.date || "?")}</div><div class="nho">nạp ${ngayGio(d.room.loadedAt)} · ${esc(d.room.by || "")}${d.room.codes ? `<br>${d.room.codes} mã` : ""}</div>` : `<p class="nho">Chưa nạp</p>`}</div>
+    <div class="the"><h3>Dashboard web</h3>${d.dash?.buoc ? `<div class="so" style="font-size:18px">${d.dash.len_web ? "🌐 Đã lên web" : d.dash.ok ? "⏳ Đang lên web" : "❌ Lỗi"}</div><div class="nho">${d.dash.ky ? `kỳ ${esc(d.dash.ky)} · ` : ""}${ngayGio(d.dash.luc)}<br>${esc(d.dash.buoc)}</div>` : `<p class="nho">Chưa gửi bản nào từ trang này</p>`}${d.dash?.site ? `<p><a class="nut nho" href="${esc(d.dash.site)}" target="_blank" rel="noopener noreferrer">Mở trang web</a></p>` : ""}</div>
+    <div class="the"><h3>Dữ liệu Fiin</h3>${fi?.bat ? `<div class="nho">Máy Fiin: <b style="color:${fi.online ? "var(--xanh)" : "var(--do)"}">${fi.online ? "online" : "OFFLINE"}</b>${fi.lan_cuoi ? ` (${tg(fi.lan_cuoi)})` : ""}<br>
+      ${fi.lenh ? `Lệnh gần nhất: <b>${({ queued: "đang chờ máy Fiin", running: "đang chạy", done: "xong", error: "lỗi" })[fi.lenh.status] || fi.lenh.status}</b> ${tg(fi.lenh.luc)}${fi.lenh.note ? ` — ${esc(fi.lenh.note)}` : ""}` : "Chưa có lệnh"}</div>
+      <p><button class="nut chinh" id="fi-lay" ${fi.lenh && ["queued", "running"].includes(fi.lenh.status) ? "disabled" : ""}>Lấy dữ liệu Fiin</button>
+      ${fi.file ? ` <a class="nut" href="/quan-ly/api/fiin-file" data-fiin>⬇ Tải ${esc(fi.file.ten)}</a><br><span class="nho">${ngayGio(fi.file.luc)} · ${fi.file.kb} KB</span>` : ""}</p>` : `<p class="nho">Chưa bật (thiếu FIIN_AGENT_TOKEN)</p>`}</div>`;
+  const nut = $("#fi-lay", s);
+  if (nut) nut.onclick = () => lam(() => api("fiin-lay", {}).then((r) => { bao(r.ket_qua); return r; }));
+
+  if (!chu) return;
+  if (!$("#nap-quyen", s)) $("#nap-chu", s).insertAdjacentHTML("beforebegin", `<div class="the" id="nap-quyen" style="margin-top:14px"></div>`);
+  const tenBot = (so) => esc((D.bot?.bots || []).find((b) => b.so === so)?.ten || `Bot ${so}`);
+  $("#nap-quyen", s).innerHTML = `<h3>Ai được tra số liệu đã nạp — dùng chung cho CẢ ${(D.bot?.bots || []).length || 1} BOT</h3>
+    <p class="nho">Chủ bot chat riêng với bot nào cũng tra được. Trong nhóm: chỉ nhóm được tick. Tick là có hiệu lực ngay, không cần khởi động lại. Số liệu MẬT — chỉ tick nhóm nội bộ.</p>
+    <div class="bang"><table><thead><tr><th>Nhóm</th><th>Bot</th><th>Tra Deal / lãi suất</th><th>Tra Room 9380</th></tr></thead><tbody>
+    ${(D.nhom || []).map((g) => `<tr data-id="${esc(g.id)}"><td><b>${esc(g.ten || "(chưa đặt tên)")}</b><div class="ma">${esc(g.id)}</div></td><td>${tenBot(g.bot)}</td>
+      <td><input type="checkbox" class="q-deal" ${(d.deal_nhom || []).includes(g.id) ? "checked" : ""}></td><td><input type="checkbox" class="q-room" ${(d.room_nhom || []).includes(g.id) ? "checked" : ""}></td></tr>`).join("") || `<tr><td colspan="4" class="nho">Chưa có nhóm — tag bot trong nhóm 1 lần là hiện</td></tr>`}
+    </tbody></table></div>`;
+  $("#nap-quyen", s).onchange = (e) => {
+    const o = e.target; if (!o.matches(".q-deal,.q-room")) return;
+    const id = o.closest("tr").dataset.id, loai = o.classList.contains("q-deal") ? "deal" : "room";
+    if (o.checked && !confirm("Số liệu MẬT. Cho nhóm này tra?")) { o.checked = false; return; }
+    lam(() => api("nhom", { id, [loai]: o.checked }), "Đã lưu — có hiệu lực ngay");
+  };
+  if (!$("#dc-vcsh", s)) {
+    $("#nap-chu", s).innerHTML = `<div class="luoi" style="margin-top:14px">
+      <div class="the"><h3>Vốn chủ sở hữu công ty (để tính % VCSH)</h3>
+        <p class="nho">Nhập 1 lần, bot nhớ luôn (cả khi khởi động lại). Muốn đổi thì sửa số rồi bấm Lưu. Gõ 0 để xoá.</p>
+        <p><input type="text" id="dc-vcsh" placeholder="vd 8.500 (tỷ đồng)"></p>
+        <p><input type="text" id="dc-nguong" placeholder="Ngưỡng cảnh báo % VCSH, vd 3 (trống = không cảnh báo)"></p>
+        <p><button class="nut chinh" id="dc-luu">Lưu</button></p></div>
+      <div class="the"><h3>Thử câu hỏi (không tốn tin Zalo)</h3>
+        <p><input type="text" id="tt-cau" placeholder="vd: full EIB · nhóm EVF · ls evf · vcsh · deal tổng · room PNJ"></p>
+        <p><button class="nut" id="tt-hoi">Thử</button></p><pre id="tt-kq" class="log" style="height:auto;max-height:340px;min-height:60px"></pre></div></div>`;
+    $("#dc-vcsh", s).value = dc.vcsh ? (dc.vcsh / 1e9).toLocaleString("vi") : "";
+    $("#dc-nguong", s).value = dc.nguong ? String(dc.nguong * 100).replace(".", ",") : "";
+    s.oninput = (e) => { if (e.target.matches("#dc-vcsh,#dc-nguong")) dangSua = true; };
+    $("#dc-luu", s).onclick = () => { dangSua = false; lam(() => api("deal-cai", { vcsh_ty: $("#dc-vcsh", s).value, nguong_pct: $("#dc-nguong", s).value }).then((r) => { bao("Bot đã nhận: " + r.ket_qua); if (r.vcsh) $("#dc-vcsh", s).value = (r.vcsh / 1e9).toLocaleString("vi"); return r; })); };
+    const hoi = async () => { try { $("#tt-kq", s).textContent = (await api("thu-tra", { cau: $("#tt-cau", s).value })).ket_qua; } catch (e) { bao(e.message, true); } };
+    $("#tt-hoi", s).onclick = hoi; $("#tt-cau", s).onkeydown = (e) => { if (e.key === "Enter") hoi(); };
+  }
+}
+
+// ================= GOOGLE AUTHENTICATOR (chỉ chủ) =================
+function ve2FA(khoaMoi) {
+  const o = $("#g2fa"); if (!o) return;
+  const nhom4 = (k) => k.replace(/(.{4})/g, "$1 ").trim();
+  if (khoaMoi) {
+    o.innerHTML = `<ol class="nho" style="padding-left:18px;margin:0 0 8px">
+      <li>Điện thoại: cài <b>Google Authenticator</b> → bấm <b>+</b> → <b>Quét mã QR</b>, quét mã này:<br><span style="display:inline-block;margin:6px 0;border:1px solid var(--vien)">${khoaMoi.qr || ""}</span><br>(không quét được: bấm <b>Huỷ</b> rồi <b>Bật</b> lại để ra mã khác, hoặc chọn <b>Nhập khoá thiết lập</b> và gõ khoá bên dưới)</li>
+      <li>Tên tài khoản: <b>Bot Zalo</b> · Khoá: <code style="font-size:15px;user-select:all">${nhom4(khoaMoi.khoa)}</code> <button class="nut nho" id="g-chep">Chép</button> · Loại: <b>Dựa trên thời gian</b>.<br>
+        <span>Mở trang này trên chính điện thoại thì bấm luôn: <a href="${esc(khoaMoi.link)}">Thêm vào Authenticator</a></span></li>
+      <li>Nhập mã 6 số app đang hiện để xác nhận:</li></ol>
+      <div class="thanh-cong"><input type="text" id="g-ma" inputmode="numeric" maxlength="7" placeholder="123456" style="max-width:140px;font-size:18px;letter-spacing:3px"><button class="nut chinh" id="g-xn">Xác nhận</button> <button class="nut" id="g-huy">Huỷ</button></div><div id="g-kq"></div>`;
+    $("#g-chep").onclick = () => navigator.clipboard.writeText(khoaMoi.khoa).then(() => bao("Đã chép khoá"));
+    $("#g-huy").onclick = () => { dangSua = false; ve2FA(); };
+    $("#g-xn").onclick = async () => {
+      try {
+        const r = await api("2fa-xac-nhan", { ma: $("#g-ma").value });
+        $("#g-kq").innerHTML = `<div class="bao ${r.khoa ? "" : "xanh"}">${esc(r.ket_qua)}${r.khoa ? `<br>Render → zalo-bot → Environment → Edit → Add variable: <b>QL_2FA</b> = <code style="user-select:all">${esc(r.khoa)}</code> <button class="nut nho" id="g-chep2">Chép</button> → mũi tên cạnh nút lưu → <b>Save only</b>.` : ""}</div>`;
+        if (r.khoa) $("#g-chep2").onclick = () => navigator.clipboard.writeText(r.khoa).then(() => bao("Đã chép"));
+        D.chu_2fa = true;
+      } catch (e) { bao(e.message, true); }
+    };
+    return;
+  }
+  o.innerHTML = D.chu_2fa
+    ? `<p class="nho"><b style="color:var(--xanh)">● Đang bật.</b> Đăng nhập bằng mật khẩu chủ phải nhập thêm mã 6 số trên điện thoại. Người nhập số liệu không cần.</p><button class="nut do" id="g-tat">Tắt</button> <button class="nut" id="g-lai">Đổi điện thoại (tạo khoá mới)</button>`
+    : `<p class="nho">Đang tắt. Bật lên thì đăng nhập bằng mật khẩu chủ phải nhập thêm mã 6 số trong app Google Authenticator trên điện thoại — lộ mật khẩu cũng không vào được.</p><button class="nut chinh" id="g-bat">Bật Google Authenticator</button>`;
+  const tao = async () => { try { dangSua = true; ve2FA(await api("2fa-tao", {})); } catch (e) { bao(e.message, true); } };
+  if ($("#g-bat")) $("#g-bat").onclick = tao;
+  if ($("#g-lai")) $("#g-lai").onclick = tao;
+  if ($("#g-tat")) $("#g-tat").onclick = async () => { if (!confirm("Tắt xác thực 2 lớp?")) return; try { bao((await api("2fa-tat", {})).ket_qua); D.chu_2fa = false; ve2FA(); } catch (e) { bao(e.message, true); } };
+}
+
+// ================= TÀI KHOẢN NHẬP SỐ LIỆU =================
+function veTk() {
+  const s = $('[data-tab=tk]');
+  s.innerHTML = `<div class="the" style="max-width:880px"><h3>Tài khoản nhập số liệu</h3>
+    <p class="nho">Người có tài khoản này CHỈ được: kéo thả file (dashboard, 9380, Deal) và bấm lấy dữ liệu Fiin. Không xem được danh bạ, cài đặt, nhật ký, không tra số liệu.
+    Mày tự đặt mật khẩu (ít nhất 5 ký tự, không trùng mật khẩu chủ hay người khác), để trống thì bot tạo ngẫu nhiên (chỉ hiện 1 lần). Gửi riêng cho người đó. Xoá / khoá là mất quyền ngay.</p>
+    <div class="thanh-cong"><input type="text" id="tk-ten" placeholder="Tên người dùng, vd: Hà Anh" style="max-width:240px"><input type="password" id="tk-mk-nhap" placeholder="Mật khẩu (trống = bot tự tạo)" autocomplete="new-password" style="max-width:240px"><label class="nho"><input type="checkbox" id="tk-hien"> hiện</label><button class="nut chinh" id="tk-tao">Tạo tài khoản</button></div>
+    <div id="tk-mk"></div>
+    <div class="bang"><table><thead><tr><th>Tên</th><th>Tạo lúc</th><th>Đăng nhập gần nhất</th><th>Trạng thái</th><th></th></tr></thead><tbody>
+    ${(D.tai_khoan || []).map((t) => `<tr data-id="${esc(t.id)}"><td><b>${esc(t.ten)}</b></td><td class="nho">${ngayGio(t.tao_luc)}</td>
+      <td class="nho">${t.lan_cuoi ? `${tg(t.lan_cuoi)}<br>${esc(t.ip_cuoi || "")}` : "chưa"}</td><td>${t.khoa ? chip("Đã khoá", "do") : chip("Đang dùng", "xanh")}</td>
+      <td style="white-space:nowrap"><button class="nut nho tk-v" data-v="${t.khoa ? "mo" : "khoa"}">${t.khoa ? "Mở" : "Khoá"}</button> <button class="nut nho tk-doi">Đổi mật khẩu</button> <button class="nut nho do tk-v" data-v="xoa">Xoá</button></td></tr>`).join("") || `<tr><td colspan="5" class="nho">Chưa có tài khoản</td></tr>`}
+    </tbody></table></div></div>`;
+  s.oninput = () => { dangSua = true; };              // đang gõ: không vẽ lại đè mất chữ
+  $("#tk-hien", s).onchange = (e) => { $("#tk-mk-nhap", s).type = e.target.checked ? "text" : "password"; };
+  const hien = (ten, mk) => { $("#tk-mk", s).innerHTML = `<div class="bao xanh">Mật khẩu của <b>${esc(ten)}</b>: <code style="font-size:16px;user-select:all">${esc(mk)}</code> <button class="nut nho" id="tk-chep">Chép</button><br><span class="nho">Chỉ hiện lần này. Đường dẫn: ${esc(location.origin)}/quan-ly</span></div>`; $("#tk-chep", s).onclick = () => navigator.clipboard.writeText(mk).then(() => bao("Đã chép")); };
+  $("#tk-tao", s).onclick = async () => {
+    const ten = $("#tk-ten", s).value.trim(), mk = $("#tk-mk-nhap", s).value; if (!ten) return bao("Nhập tên", true);
+    dangSua = false;
+    try { const r = await api("tai-khoan", { viec: "tao", ten, mat_khau: mk }); await tai(); if (r.mat_khau) hien(ten, r.mat_khau); else bao(`Đã tạo tài khoản ${ten} với mật khẩu mày đặt`); } catch (e) { bao(e.message, true); }
+  };
+  s.onclick = async (e) => {
+    const d = e.target.closest(".tk-doi");
+    if (d) {                                       // hiện ô đổi mật khẩu ngay dưới dòng
+      const tr = d.closest("tr"); if (tr.nextElementSibling?.classList.contains("tk-o")) return tr.nextElementSibling.remove();
+      tr.insertAdjacentHTML("afterend", `<tr class="tk-o"><td colspan="5"><div class="thanh-cong" style="margin:0"><input type="password" class="tk-mk2" placeholder="Mật khẩu mới (trống = bot tự tạo)" autocomplete="new-password" style="max-width:260px"><button class="nut nho chinh tk-luu-mk" data-id="${tr.dataset.id}">Lưu mật khẩu</button><span class="nho">Người đó phải đăng nhập lại bằng mật khẩu mới</span></div></td></tr>`);
+      tr.nextElementSibling.querySelector("input").focus(); dangSua = true; return;
+    }
+    const l = e.target.closest(".tk-luu-mk");
+    if (l) {
+      const row = l.closest("tr"), tr = row.previousElementSibling, ten = tr.querySelector("b").textContent;
+      dangSua = false;
+      try { const r = await api("tai-khoan", { viec: "dat-lai", id: l.dataset.id, mat_khau: row.querySelector(".tk-mk2").value }); await tai(); if (r.mat_khau) hien(ten, r.mat_khau); else bao(`Đã đổi mật khẩu cho ${ten}`); } catch (er) { bao(er.message, true); }
+      return;
+    }
+    const b = e.target.closest(".tk-v"); if (!b) return;
+    const tr = b.closest("tr"), id = tr.dataset.id, ten = tr.querySelector("b").textContent, v = b.dataset.v;
+    if (v === "xoa" && !confirm(`Xoá tài khoản ${ten}?`)) return;
+    try { const r = await api("tai-khoan", { viec: v, id }); await tai(); if (r.mat_khau) hien(ten, r.mat_khau); else bao("Xong"); } catch (er) { bao(er.message, true); }
+  };
+}
+
+// ================= BẢN SAO TRÊN TRÌNH DUYỆT (mã hoá — chỉ bot giải được) =================
+// Bot restart (Render xoá ổ đĩa) -> trình duyệt nào mở trang trước sẽ nạp lại. Máy nhà + máy cơ quan: bot gộp, giữ bản MỚI NHẤT từng mục.
 const BS = {
   db: () => new Promise((ok, loi) => { const r = indexedDB.open("bot-zalo", 1); r.onupgradeneeded = () => r.result.createObjectStore("bs"); r.onsuccess = () => ok(r.result); r.onerror = () => loi(r.error); }),
   async doc() { try { const db = await BS.db(); return await new Promise((ok) => { const q = db.transaction("bs").objectStore("bs").get("ban_sao"); q.onsuccess = () => ok(q.result || null); q.onerror = () => ok(null); }); } catch { return null; } },
   async ghi(v) { try { const db = await BS.db(); await new Promise((ok) => { const t = db.transaction("bs", "readwrite"); t.objectStore("bs").put(v, "ban_sao"); t.oncomplete = ok; t.onerror = ok; }); } catch { /* */ } },
 };
-let daDuaLen = false;
-async function dongBo() {
-  const o = $("#bs-tt");
+let bsLayLuc = 0, daDuaLen = false;
+async function dongBo(lucBot, ep = false) {
+  const cua = await BS.doc();
+  // mỗi lần đăng nhập: LUÔN đưa bản sao máy này lên trước (bot gộp, giữ bản mới nhất TỪNG mục) rồi mới lấy bản của bot về.
+  // (không so mốc giờ cả kho: bot vừa restart tự ghi tin bật/đếm tin nên trông "mới hơn" dù thiếu VCSH, deal, room…)
+  if (cua && !daDuaLen) {
+    daDuaLen = true;
+    try { const r = await api("khoi-phuc", { blob: cua.blob }); if (r.lay?.length) { bao("Đã đưa số liệu đang giữ trên máy này lên bot: " + r.lay.join(", ")); lucBot = r.luc || lucBot; ep = true; } } catch { /* */ }
+  }
+  if (ep || !cua || lucBot > cua.luc) {
+    if (!ep && Date.now() - bsLayLuc < (window.GH ? 600_000 : 60_000)) return;   // giữ bản sao mới, tối đa 1 lần/phút (GitHub: 10 phút)
+    bsLayLuc = Date.now();
+    try { const r = await api("ban-sao"); await BS.ghi({ luc: r.luc, blob: r.blob, cat_luc: Date.now() }); } catch { /* */ }
+  }
+}
+async function cuuBotTrong() {                                     // trước khi đăng nhập: bot trống -> nạp lại ngay
   try {
+    const t = await (await fetch("/quan-ly/api/tinh-trang", { credentials: "same-origin" })).json();
     const cua = await BS.doc();
-    if (cua?.blob && !daDuaLen) {
-      daDuaLen = true;
-      o.textContent = "Đang đưa bản sao trên máy này lên bot…";
-      const r = await viec("khoi-phuc", { blob: cua.blob }, () => {});
-      if (r.lay?.length) { o.textContent = "Bot vừa khởi động lại — đã nạp lại từ máy này: " + r.lay.join(", "); xemTT(); }
+    if (t.trong && cua?.blob) {
+      const r = await fetch("/quan-ly/api/khoi-phuc", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json", "x-ql": "1" }, body: JSON.stringify({ blob: cua.blob }) });
+      if (r.ok) bao("Bot vừa khởi động lại — đã tự nạp lại số liệu từ máy này");
     }
-    const r = await viec("ban-sao", {}, () => {});
-    await BS.ghi({ luc: r.luc, blob: r.blob, cat_luc: Date.now() });
-    o.textContent = `Máy này giữ bản sao mã hoá lúc ${gio(Date.now())} (bot khởi động lại sẽ tự nạp lại khi đăng nhập).`;
-  } catch (e) { o.textContent = "Bản sao: " + e.message; }
+  } catch { /* */ }
 }
-function vao() {
-  const ai = JSON.parse(sessionStorage.getItem("ai") || "{}");
-  $("#dangnhap").classList.add("an"); $("#app").classList.remove("an");
-  $("#ai").textContent = `${ai.ten} (${ai.vai === "chu" ? "chủ" : "nhập số liệu"})`;
-  if (ai.vai === "chu") { $("#o-vcsh").classList.remove("an"); $("#o-thu").classList.remove("an"); }
-  dongBo().then(xemTT);
-}
-$("#lai").onclick = xemTT;
 
-// ---------- nạp file: đọc Excel ngay trên máy (bộ đọc không tải được -> gửi nguyên file, bot tự đọc) ----------
-let xlsxSan = null;
-const napXlsx = () => (xlsxSan ??= new Promise((ok, loi) => { const s = document.createElement("script"); s.src = "xlsx.full.min.js"; s.onload = () => (window.XLSX ? ok(window.XLSX) : loi(new Error("hỏng"))); s.onerror = () => loi(new Error("không tải được")); document.head.append(s); }).catch((e) => { xlsxSan = null; throw e; }));
-let dang = false;
-async function napFile(f) {
-  const o = $("#nap-kq");
-  if (dang) return hien(o, "Đang nạp file khác, chờ chút", "do");
-  dang = true;
-  const ghi = (m) => hien(o, `${f.name}: ${m}`);
+// ================= CHẠY =================
+async function tai() {
   try {
-    let body;
-    if (/\.html?$/i.test(f.name)) body = { kieu: "dash", ten: f.name, text: await f.text() };
-    else if (/\.xlsx?$/i.test(f.name)) {
-      ghi("đang đọc trên máy này…");
-      const ab = await f.arrayBuffer(), X = await napXlsx().catch(() => null);
-      if (!X) { if (f.size > 20 * 1048576) throw new Error("file quá 20 MB"); body = { kieu: "xlsx-tho", ten: f.name, base64: b64(ab) }; }
-      else if (X.read(ab, { type: "array", bookSheets: true }).SheetNames.includes("Tổng hợp nhóm")) {
-        const wb = X.read(ab, { type: "array", sheets: ["Tổng hợp nhóm", "Tổng quan", "RAW 9385"] });
-        const r9 = wb.Sheets["RAW 9385"] ? X.utils.sheet_to_json(wb.Sheets["RAW 9385"], { header: 1, defval: "", raw: true }) : null;
-        body = { kieu: "deal", ten: f.name, ...(r9 ? { raw_9385: r9.map((r) => [r[2], r[4]]), ngay_9385: r9[0]?.[3] } : {}), rows: X.utils.sheet_to_json(wb.Sheets["Tổng hợp nhóm"], { header: 1, defval: "", raw: true }),
-          tong_quan: wb.Sheets["Tổng quan"] ? X.utils.sheet_to_json(wb.Sheets["Tổng quan"], { header: 1, defval: "", raw: false }).slice(0, 5) : [] };
-      } else { if (f.size > 20 * 1048576) throw new Error("file 9380 quá 20 MB"); body = { kieu: "room", ten: f.name, base64: b64(ab) }; }
-    } else throw new Error("Chỉ nhận .html hoặc .xls/.xlsx");
-    const kq = await viec("nap-file", body, ghi);
-    hien(o, `${f.name}\n${kq.ket_qua}`, "xanh");
-    xemTT(); dongBo();
-  } catch (e) { hien(o, `${f.name}: ❌ ${e.message}`, "do"); }
-  finally { dang = false; }
+    D = await api(VAI === "chu" ? "du-lieu" : "du-lieu-nhap");
+    ve();
+    dongBo(D.kho?.luc || 0);
+  } catch (e) { if (!/đăng nhập/.test(e.message)) { $("#h-tt").textContent = "Không kết nối được bot"; $("#h-cham").className = "cham off"; } }
 }
-async function napNhieu(ds) { for (const f of ds) { await napFile(f); } }
-const tha = $("#tha");
-tha.onclick = () => $("#chon").click();
-$("#chon").onchange = (e) => { napNhieu([...e.target.files]); e.target.value = ""; };
-tha.ondragover = (e) => { e.preventDefault(); tha.classList.add("keo"); };
-tha.ondragleave = () => tha.classList.remove("keo");
-tha.ondrop = (e) => { e.preventDefault(); tha.classList.remove("keo"); napNhieu([...e.dataTransfer.files]); };
-
-$("#vcsh-nut").onclick = async () => {
-  const o = $("#vcsh-kq"), n = $("#vcsh-nut"); n.disabled = true;
-  try { hien(o, (await viec("deal-cai", { vcsh_ty: $("#vcsh").value }, (m) => hien(o, m))).ket_qua, "xanh"); dongBo(); }
-  catch (e) { hien(o, "❌ " + e.message, "do"); } finally { n.disabled = false; }
-};
-$("#thu-nut").onclick = async () => {
-  const o = $("#thu-kq"), n = $("#thu-nut"); n.disabled = true;
-  try { hien(o, (await viec("thu-tra", { cau: $("#cau").value }, (m) => hien(o, m))).ket_qua); }
-  catch (e) { hien(o, "❌ " + e.message, "do"); } finally { n.disabled = false; }
-};
-
-// ---------- mở trang ----------
+async function batDau() {
+  $("#dangnhap").classList.add("an"); $("#app").classList.remove("an");
+  for (const s of document.querySelectorAll("main section")) s.innerHTML = "";   // không giữ gì của phiên trước
+  D = null; dangSua = false; daDuaLen = false;
+  const ds = VAI === "chu" ? (window.GH ? TABS_CHU.filter(([k]) => k !== "cai") : TABS_CHU) : TABS_NHAP;   // qua GitHub: không sửa cài đặt
+  if (!ds.some(([k]) => k === tab)) tab = ds[0][0];
+  $("#tabs").innerHTML = ds.map(([k, t]) => `<button data-k="${k}">${t}</button>`).join("");
+  for (const id of ["#h-tamdung", "#h-kdl"]) $(id).classList.toggle("an", VAI !== "chu" || (id === "#h-kdl" && !!window.GH));
+  await tai();
+  clearInterval(hen);
+  hen = setInterval(() => { if (document.hidden) return; if (tab === "log") { if (tuDong) veLog(); } else tai(); }, window.GH ? 60_000 : 8000);
+}
 (async () => {
-  try { CH = await (await fetch("cau-hinh.json", { cache: "no-store" })).json(); }
-  catch { $("#dn-tt").textContent = "❌ Thiếu cau-hinh.json — chủ bot chưa cài"; return; }
-  const k = sessionStorage.getItem("khoa_trang") || localStorage.getItem("khoa_trang");
-  if (k) { $("#khoa").value = k; $("#nho").checked = !!localStorage.getItem("khoa_trang"); }
-  if (k && sessionStorage.getItem("phien")) { try { await moKhoa(k); vao(); } catch {} }
+  if (window.GH) { GH.moTrang(); hienDangNhap(GH.ghi); return; }       // trang GitHub: không gọi thẳng bot
+  await cuuBotTrong();
+  try {
+    const r = await fetch("/quan-ly/api/toi", { credentials: "same-origin" });
+    const j = await r.json().catch(() => ({}));
+    if (j.chua_mk) { hienDangNhap(j.loi); $("#dn-form").classList.add("an"); return; }
+    // MỖI LẦN MỞ / TẢI LẠI TRANG đều phải đăng nhập lại: huỷ phiên cũ (nếu có)
+    if (r.ok) await fetch("/quan-ly/api/dang-xuat", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json", "x-ql": "1" }, body: "{}" }).catch(() => {});
+    hienDangNhap();
+  } catch { hienDangNhap("Không kết nối được bot."); }
 })();
 </script>
 </body>
