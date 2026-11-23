@@ -46,7 +46,7 @@ td{padding:4px 10px 4px 0;vertical-align:top}
 <div id="app" class="an">
 <header><h1>📥 Nạp số liệu bot</h1><span class="nho" id="ai"></span><button class="nut phai" id="thoat">Đăng xuất</button></header>
 <main>
-  <div class="the"><h3>Số liệu bot đang có</h3><div id="tt" class="nho">…</div><p><button class="nut" id="lai">Xem lại</button></p></div>
+  <div class="the"><h3>Số liệu bot đang có</h3><div id="tt" class="nho">…</div><div id="bs-tt" class="nho" style="margin-top:6px"></div><p><button class="nut" id="lai">Xem lại</button></p></div>
   <div class="the"><h3>Kéo thả file</h3>
     <div id="tha">Kéo file vào đây hoặc bấm để chọn<br><span class="nho">Dashboard (.html) · File 9380 (.xls) · "Final Deal mass theo ngành" (.xlsx)</span></div>
     <input type="file" id="chon" accept=".html,.htm,.xls,.xlsx" class="an" multiple>
@@ -157,12 +157,35 @@ async function xemTT() {
     dong("Dashboard", d.dash ? `${d.dash.ky || ""} · ${gio(d.dash.luc)} · ${d.dash.ok ? "OK" : d.dash.buoc || ""}` : "—");
   } catch (e) { o.textContent = "❌ " + e.message; }
 }
+// ---------- BẢN SAO TRÊN TRÌNH DUYỆT (mã hoá bằng khoá của bot — chỉ bot giải được) ----------
+// Render xoá ổ đĩa mỗi lần deploy -> mỗi lần đăng nhập đưa bản sao máy này lên (bot gộp, giữ MỚI NHẤT từng mục), rồi lấy bản mới về giữ.
+const BS = {
+  db: () => new Promise((ok, loi) => { const r = indexedDB.open("bot-zalo", 1); r.onupgradeneeded = () => r.result.createObjectStore("bs"); r.onsuccess = () => ok(r.result); r.onerror = () => loi(r.error); }),
+  async doc() { try { const db = await BS.db(); return await new Promise((ok) => { const q = db.transaction("bs").objectStore("bs").get("ban_sao"); q.onsuccess = () => ok(q.result || null); q.onerror = () => ok(null); }); } catch { return null; } },
+  async ghi(v) { try { const db = await BS.db(); await new Promise((ok) => { const t = db.transaction("bs", "readwrite"); t.objectStore("bs").put(v, "ban_sao"); t.oncomplete = ok; t.onerror = ok; }); } catch { /* */ } },
+};
+let daDuaLen = false;
+async function dongBo() {
+  const o = $("#bs-tt");
+  try {
+    const cua = await BS.doc();
+    if (cua?.blob && !daDuaLen) {
+      daDuaLen = true;
+      o.textContent = "Đang đưa bản sao trên máy này lên bot…";
+      const r = await viec("khoi-phuc", { blob: cua.blob }, () => {});
+      if (r.lay?.length) { o.textContent = "Bot vừa khởi động lại — đã nạp lại từ máy này: " + r.lay.join(", "); xemTT(); }
+    }
+    const r = await viec("ban-sao", {}, () => {});
+    await BS.ghi({ luc: r.luc, blob: r.blob, cat_luc: Date.now() });
+    o.textContent = `Máy này giữ bản sao mã hoá lúc ${gio(Date.now())} (bot khởi động lại sẽ tự nạp lại khi đăng nhập).`;
+  } catch (e) { o.textContent = "Bản sao: " + e.message; }
+}
 function vao() {
   const ai = JSON.parse(sessionStorage.getItem("ai") || "{}");
   $("#dangnhap").classList.add("an"); $("#app").classList.remove("an");
   $("#ai").textContent = `${ai.ten} (${ai.vai === "chu" ? "chủ" : "nhập số liệu"})`;
   if (ai.vai === "chu") { $("#o-vcsh").classList.remove("an"); $("#o-thu").classList.remove("an"); }
-  xemTT();
+  dongBo().then(xemTT);
 }
 $("#lai").onclick = xemTT;
 
@@ -190,7 +213,7 @@ async function napFile(f) {
     } else throw new Error("Chỉ nhận .html hoặc .xls/.xlsx");
     const kq = await viec("nap-file", body, ghi);
     hien(o, `${f.name}\n${kq.ket_qua}`, "xanh");
-    xemTT();
+    xemTT(); dongBo();
   } catch (e) { hien(o, `${f.name}: ❌ ${e.message}`, "do"); }
   finally { dang = false; }
 }
@@ -204,7 +227,7 @@ tha.ondrop = (e) => { e.preventDefault(); tha.classList.remove("keo"); napNhieu(
 
 $("#vcsh-nut").onclick = async () => {
   const o = $("#vcsh-kq"), n = $("#vcsh-nut"); n.disabled = true;
-  try { hien(o, (await viec("deal-cai", { vcsh_ty: $("#vcsh").value }, (m) => hien(o, m))).ket_qua, "xanh"); }
+  try { hien(o, (await viec("deal-cai", { vcsh_ty: $("#vcsh").value }, (m) => hien(o, m))).ket_qua, "xanh"); dongBo(); }
   catch (e) { hien(o, "❌ " + e.message, "do"); } finally { n.disabled = false; }
 };
 $("#thu-nut").onclick = async () => {
