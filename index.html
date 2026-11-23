@@ -34,7 +34,7 @@ td{padding:4px 10px 4px 0;vertical-align:top}
   <h2 style="margin-top:0">Nạp số liệu bot</h2>
   <p class="nho">Đường qua GitHub — dùng khi máy không vào được trang quản lý thường. Mỗi việc mất ~15–40 giây.</p>
   <form id="dn">
-    <input type="password" id="khoa" placeholder="Khoá trang (đội dùng chung)" autocomplete="off">
+    <input type="text" id="khoa" placeholder="Khoá trang: xxxx-xxxx-xxxx-xxxx" autocomplete="off" spellcheck="false" autocapitalize="off">
     <label class="nho" style="display:block;margin-top:4px"><input type="checkbox" id="nho"> nhớ khoá trang trên máy này</label>
     <input type="password" id="mk" placeholder="Mật khẩu của mày (như trang quản lý)" autocomplete="current-password">
     <input type="text" id="ma" class="an" placeholder="Mã 6 số Google Authenticator" inputmode="numeric" maxlength="7">
@@ -112,16 +112,27 @@ const viec = async (p, body, ghi) => { const kq = await gui({ phien: sessionStor
 function hien(el, m, kieu = "") { el.innerHTML = ""; const d = document.createElement("div"); d.className = "kq " + kieu; d.textContent = m; el.append(d); }
 
 // ---------- đăng nhập ----------
+/** khoá dạng xxxx-xxxx-xxxx-xxxx: bỏ dấu cách/xuống dòng, chữ thường, thiếu gạch thì tự thêm */
+function chuanKhoa(k) {
+  let s = String(k || "").toLowerCase().replace(/[\s​ ]/g, "");
+  const tron = s.replace(/[^a-z0-9]/g, "");
+  if (/^[a-z0-9]{16}$/.test(tron) && /^[a-z0-9-]+$/.test(s)) s = tron.replace(/(.{4})(?=.)/g, "$1-");
+  return s;
+}
 async function moKhoa(k) {
-  KEY = await taoKhoa(k);
-  try { TOKEN = await giaiMa(tuB64(CH.tk)); } catch { KEY = null; throw new Error("Sai khoá trang"); }
+  for (const thu of [...new Set([chuanKhoa(k), String(k || "").trim()])]) {
+    KEY = await taoKhoa(thu);
+    try { TOKEN = await giaiMa(tuB64(CH.tk)); return thu; } catch {}
+  }
+  KEY = null;
+  throw new Error("Sai khoá trang. Khoá có dạng xxxx-xxxx-xxxx-xxxx (16 chữ/số, 3 gạch ngang) trong file KHOA-TRANG-GITHUB.txt — KHÔNG phải mật khẩu đăng nhập. Mật khẩu gõ ở ô thứ 2.");
 }
 $("#dn").onsubmit = async (e) => {
   e.preventDefault();
   const nut = $("#dn-nut"), tt = $("#dn-tt"); nut.disabled = true;
   try {
-    const k = $("#khoa").value;
-    await moKhoa(k);
+    const k = await moKhoa($("#khoa").value);
+    $("#khoa").value = k;
     if ($("#nho").checked) localStorage.setItem("khoa_trang", k); else localStorage.removeItem("khoa_trang");
     sessionStorage.setItem("khoa_trang", k);
     const kq = await gui({ dang_nhap: { mat_khau: $("#mk").value, ma: $("#ma").value } }, (m) => (tt.textContent = m));
