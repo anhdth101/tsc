@@ -206,8 +206,9 @@ async function napFile(f) {
       const ab = await f.arrayBuffer(), X = await napXlsx().catch(() => null);
       if (!X) { if (f.size > 20 * 1048576) throw new Error("file quá 20 MB"); body = { kieu: "xlsx-tho", ten: f.name, base64: b64(ab) }; }
       else if (X.read(ab, { type: "array", bookSheets: true }).SheetNames.includes("Tổng hợp nhóm")) {
-        const wb = X.read(ab, { type: "array", sheets: ["Tổng hợp nhóm", "Tổng quan"] });
-        body = { kieu: "deal", ten: f.name, rows: X.utils.sheet_to_json(wb.Sheets["Tổng hợp nhóm"], { header: 1, defval: "", raw: true }),
+        const wb = X.read(ab, { type: "array", sheets: ["Tổng hợp nhóm", "Tổng quan", "RAW 9385"] });
+        const r9 = wb.Sheets["RAW 9385"] ? X.utils.sheet_to_json(wb.Sheets["RAW 9385"], { header: 1, defval: "", raw: true }) : null;
+        body = { kieu: "deal", ten: f.name, ...(r9 ? { raw_9385: r9.map((r) => [r[2], r[4]]), ngay_9385: r9[0]?.[3] } : {}), rows: X.utils.sheet_to_json(wb.Sheets["Tổng hợp nhóm"], { header: 1, defval: "", raw: true }),
           tong_quan: wb.Sheets["Tổng quan"] ? X.utils.sheet_to_json(wb.Sheets["Tổng quan"], { header: 1, defval: "", raw: false }).slice(0, 5) : [] };
       } else { if (f.size > 20 * 1048576) throw new Error("file 9380 quá 20 MB"); body = { kieu: "room", ten: f.name, base64: b64(ab) }; }
     } else throw new Error("Chỉ nhận .html hoặc .xls/.xlsx");
